@@ -1,0 +1,13 @@
+**/*.ipynb
+**/__pycache__
+**/.ipynb_checkpoints
+backend/.env
+**/.idea
+/.idea
+.vscode/launch.json
+**/venv
+**/train
+/frontend/node_modules/
+**/*.pem
+/certs/
+

@@ -1,0 +1,24 @@
+services:
+  app-backend:
+    build:
+      context: ./backend
+    image: bill-backend
+    container_name: bill-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - user_data:/app/user_data
+    env_file: backend/.env
+    networks:
+      - app-network
+      -
+networks:
+  app-network:
+
+volumes:
+  user_data:
+
+secrets:
+  MONGO_DB_KEY_BASE64:
+    file: ./mongo-secret
