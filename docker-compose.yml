@@ -2,23 +2,34 @@ services:
   app-backend:
     build:
       context: ./backend
-    image: bill-backend
-    container_name: bill-backend
+    image: app-backend
+    container_name: app-backend
     restart: always
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
-      - user_data:/app/user_data
+      - user-data:/app/user_data
     env_file: backend/.env
+    depends_on:
+      - mongo
     networks:
       - app-network
-      -
+
+  mongo:
+    image: mongo:7.0.5
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    env_file: mongo.env
+    networks:
+      - app-network
+
 networks:
   app-network:
 
 volumes:
-  user_data:
-
-secrets:
-  MONGO_DB_KEY_BASE64:
-    file: ./mongo-secret
+  user-data:
+  mongo-data:
