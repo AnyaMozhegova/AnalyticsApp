@@ -23,6 +23,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+      - ./mongod.conf:/etc/mongo/mongod.conf
+    command: [ "--config", "/etc/mongo/mongod.conf" ]
     env_file: mongo.env
     networks:
       - app-network

@@ -12,3 +12,5 @@ mongo.env
 **/*.pem
 /certs/
 
+/backend/tests/.coverage
+/backend/.coverage

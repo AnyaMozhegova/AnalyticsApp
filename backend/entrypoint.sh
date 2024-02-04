@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-mkdir -p /root/.config/gcloud
-echo "$MONGO_DB_KEY_BASE64" | base64 -d > /backend/db.pem
+echo "Running migrations..."
+python run_migrations.py
 
 exec "$@"
