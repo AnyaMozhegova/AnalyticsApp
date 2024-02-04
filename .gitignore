@@ -2,6 +2,7 @@
 **/__pycache__
 **/.ipynb_checkpoints
 backend/.env
+mongo.env
 **/.idea
 /.idea
 .vscode/launch.json
