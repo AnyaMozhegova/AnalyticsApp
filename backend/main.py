@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO,
 
 app = FastAPI(docs_url=None, redoc_url=None)
 
-MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://admin:123@mongo:27017/analyticsDB")
+MONGODB_URL = os.getenv("MONGODB_URL")
 connect(host=MONGODB_URL)
 
 
