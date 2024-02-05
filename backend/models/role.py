@@ -13,5 +13,11 @@ class Role(Document):
         if User.objects(roles=document).count() > 0:
             raise OperationError("Cannot delete a role that is assigned to users.")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
+
 
 signals.pre_delete.connect(Role.pre_delete, sender=Role)
