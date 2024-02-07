@@ -5,13 +5,15 @@ from models.indicator_value import IndicatorValue
 
 from models.user import User
 
+from models.column import Column
+
 
 class Report(Document):
     id = SequenceField(primary_key=True)
     user = ReferenceField(User, reverse_delete_rule=CASCADE, required=True)
     report_link = StringField(required=True)
     date_uploaded = DateTimeField(required=True)
-    indicator_values = ListField(ReferenceField(IndicatorValue, reverse_delete_rule=PULL), required=True)
+    columns = ListField(ReferenceField(Column, reverse_delete_rule=PULL), required=True)
     fits_correlation_analysis = BooleanField(required=True)
     fits_dispersion_analysis = BooleanField(required=True)
 
@@ -20,9 +22,8 @@ class Report(Document):
             'id': self.id,
             'user': self.user.id,
             'report_link': self.report_link,
+            'columns': ['' if not column else column.to_dict() for column in self.columns],
             'date_uploaded': self.date_uploaded.strftime('%Y-%m-%d %H:%M:%S'),
-            'indicator_values': ['' if not indicator_value else indicator_value.to_dict() for indicator_value in
-                                 self.indicator_values],
             'fits_correlation_analysis': self.fits_correlation_analysis,
             'fits_dispersion_analysis': self.fits_dispersion_analysis
         }
