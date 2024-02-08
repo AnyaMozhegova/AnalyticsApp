@@ -2,5 +2,5 @@ from pydantic import BaseModel
 
 
 class IndicatorValueCreate(BaseModel):
-    reportIndicator: int
-    value: float
+    report_indicator: int
+    column: int
