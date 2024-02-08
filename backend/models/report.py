@@ -1,11 +1,7 @@
+from models.report_column import ReportColumn
+from models.user import User
 from mongoengine import BooleanField, CASCADE, DateTimeField, Document, ListField, PULL, ReferenceField, SequenceField, \
     StringField
-
-from models.indicator_value import IndicatorValue
-
-from models.user import User
-
-from models.column import Column
 
 
 class Report(Document):
@@ -13,7 +9,7 @@ class Report(Document):
     user = ReferenceField(User, reverse_delete_rule=CASCADE, required=True)
     report_link = StringField(required=True)
     date_uploaded = DateTimeField(required=True)
-    columns = ListField(ReferenceField(Column, reverse_delete_rule=PULL), required=True)
+    columns = ListField(ReferenceField(ReportColumn, reverse_delete_rule=PULL), required=True)
     fits_correlation_analysis = BooleanField(required=True)
     fits_dispersion_analysis = BooleanField(required=True)
 
