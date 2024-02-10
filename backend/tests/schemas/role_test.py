@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from backend.schemas.role import RoleCreate, validate_name
+from schemas.role import RoleCreate, validate_name
 
 
 @pytest.mark.parametrize("name", ["Author", "Super admin", "a" * 10])
@@ -23,7 +23,7 @@ def test_role_create_success():
     assert role.name == role_data["name"]
 
 
-def test_role_create_password_mismatch():
+def test_role_create_failure():
     role_data = {
         "name": " " * 5
     }
