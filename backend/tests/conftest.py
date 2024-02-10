@@ -31,23 +31,17 @@ def clean_up_test(db_name):
     disconnect(alias="default")
 
 
-@pytest.fixture(scope="function")
-def admin_user():
-    db_name = "test_db"
-    connect_test(db_name)
+def create_admin_user() -> User:
     admin_role = Role(name='admin').save()
-    admin_user_entity = User(name='admin_user', email="admin@gmail.com", password="admin_password",
-                             role=admin_role).save()
-    yield admin_user_entity
-    clean_up_test(db_name)
+    user = User(name='admin_user', email="admin@gmail.com", password="admin_password!123",
+                role=admin_role)
+    user.save()
+    return user
 
 
-@pytest.fixture(scope="function")
-def customer_user():
-    db_name = "test_db"
-    connect_test(db_name)
+def create_customer_user() -> User:
     customer_role = Role(name='customer').save()
-    customer_user_entity = User(name='customer_user', email="customer@gmail.com", password="customer_password",
-                                role=customer_role).save()
-    yield customer_user_entity
-    clean_up_test(db_name)
+    user = User(name='customer_user', email="customer@gmail.com", password="customer_password!123",
+                role=customer_role)
+    user.save()
+    return user
