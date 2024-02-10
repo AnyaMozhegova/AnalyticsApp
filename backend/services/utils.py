@@ -14,7 +14,7 @@ def models_to_dict(objs: list):
 
 
 def check_admin_access(user_id: int) -> Optional[bool]:
-    if user := User.objects(id=user_id).first():
+    if user := User.objects(id=user_id, is_active=True).first():
         if (role := Role.objects(id=user.role.id).first()) and role.name.lower() == 'admin':
             return True
         raise NotFoundError("User is not found")
@@ -22,7 +22,7 @@ def check_admin_access(user_id: int) -> Optional[bool]:
 
 
 def check_customer_access(user_id: int) -> Optional[bool]:
-    if user := User.objects(id=user_id).first():
+    if user := User.objects(id=user_id, is_active=True).first():
         if (role := Role.objects(id=user.role.id).first()) and role.name.lower() == 'customer':
             return True
         raise NotFoundError("User is not found")
