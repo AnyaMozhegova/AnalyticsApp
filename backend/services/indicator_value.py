@@ -85,7 +85,7 @@ def calculate_variation_range(column_data: List[float]) -> float:
 
 
 def create_indicator_value(indicator_value_create: IndicatorValueCreate) -> int:
-    if not (column := ReportColumn.objects(id=indicator_value_create.column).first()):
+    if not (column := ReportColumn.objects(id=indicator_value_create.column, is_active=True).first()):
         raise NotFoundError(
             f"Could not create indicator value. There is no column with id = {indicator_value_create.column}")
 
@@ -115,16 +115,16 @@ def delete_indicator_value(indicator_value_id: int):
 
 
 def validate_indicator_value_column(get_base: IndicatorValueGetBase) -> Optional[ReportColumn]:
-    if not (user := User.objects(id=get_base.user).first()):
+    if not (user := User.objects(id=get_base.user, is_active=True).first()):
         raise NotFoundError(
             f"Could not get indicator values. There is no user with id = {get_base.user}")
-    if not (report := Report.objects(id=get_base.report).first()):
+    if not (report := Report.objects(id=get_base.report, is_active=True).first()):
         raise NotFoundError(
             f"Could not get indicator values. There is no report with id = {get_base.report}")
     if report.user.id != user.id:
         raise ForbiddenError(f"Could not get indicator values. Report with id = {get_base.report} "
                              f"does not belongs to user with id = {user.id}")
-    if not (column := ReportColumn.objects(id=get_base.column).first()):
+    if not (column := ReportColumn.objects(id=get_base.column, is_active=True).first()):
         raise NotFoundError(
             f"Could not get indicator values. There is no column with id = {get_base.column}")
     if column not in report.columns:
