@@ -109,7 +109,7 @@ def create_indicator_value(indicator_value_create: IndicatorValueCreate) -> int:
 
 def delete_indicator_value(indicator_value_id: int):
     if not (indicator_value := IndicatorValue.objects(id=indicator_value_id, is_active=True).first()):
-        raise NotFoundError(f"Could not get indicator value. There is no such entity with id = {indicator_value_id}")
+        raise NotFoundError(f"Could not delete indicator value. There is no such entity with id = {indicator_value_id}")
     indicator_value.is_active = False
     indicator_value.save()
 
