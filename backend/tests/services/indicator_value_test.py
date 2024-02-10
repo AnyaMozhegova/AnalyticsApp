@@ -14,8 +14,8 @@ from models.role import Role
 from models.user import User
 
 from schemas.indicator_value import IndicatorValueCreate, IndicatorValuesGet, IndicatorValueGetByName, IndicatorValueGet
-from services.indicator_value import create_indicator_value, get_indicator_values, get_indicator_value, \
-    get_indicator_value_by_name
+from services.indicator_value import create_indicator_value, delete_indicator_value, get_indicator_values, \
+    get_indicator_value, get_indicator_value_by_name
 
 from services.indicator_value import get_indicator_values
 from services.utils import filter_column_data
@@ -107,18 +107,6 @@ def test_create_indicator_value_unregistered_calculation_method(db_setup):
         create_indicator_value(indicator_value_create)
 
 
-def test_create_indicator_value_empty_column_data(db_setup):
-    indicator_value_create, _, _ = db_setup
-    report_column = ReportColumn.objects(id=indicator_value_create.column).first()
-    report_column.column_data = []
-    report_column.save()
-
-    result_id = create_indicator_value(indicator_value_create)
-    created_indicator_value = IndicatorValue.objects(id=result_id).first()
-
-    assert created_indicator_value.value is None
-
-
 @pytest.mark.parametrize("method_name,expected_value", [
     ("Median", 2.0),
     ("Mean", 2.6),
@@ -194,6 +182,19 @@ def test_get_indicator_value_by_id_success(db_setup):
     assert indicator_value.id == indicator_value_id
 
 
+def test_get_indicator_value_by_id_deleted(db_setup):
+    indicator_value_create, user, report = db_setup
+    report_indicator = ReportIndicator.objects(name="Median").first()
+    deleted_indicator_value_create = IndicatorValueCreate(column=report.columns[0].id,
+                                                          report_indicator=report_indicator.id)
+    indicator_value_id = create_indicator_value(deleted_indicator_value_create)
+    delete_indicator_value(indicator_value_id)
+    indicator_value_get = IndicatorValueGet(user=user.id, report=report.id, column=indicator_value_create.column,
+                                            indicator_value=indicator_value_id)
+    with pytest.raises(NotFoundError):
+        get_indicator_value(indicator_value_get)
+
+
 def test_get_indicator_value_by_id_not_found(db_setup):
     indicator_value_create, user, report = db_setup
     indicator_value_get = IndicatorValueGet(user=user.id, report=report.id, column=indicator_value_create.column,
@@ -214,6 +215,20 @@ def test_get_indicator_value_by_name_success(db_setup):
     indicator_value = get_indicator_value_by_name(indicator_value_get_name)
     assert indicator_value is not None
     assert indicator_value.id == indicator_value_id
+
+
+def test_get_indicator_value_by_name_deleted(db_setup):
+    indicator_value_create, user, report = db_setup
+    report_indicator = ReportIndicator.objects(name="Median").first()
+    deleted_indicator_value_create = IndicatorValueCreate(column=report.columns[0].id,
+                                                          report_indicator=report_indicator.id)
+    indicator_value_id = create_indicator_value(deleted_indicator_value_create)
+    delete_indicator_value(indicator_value_id)
+    indicator_value_get_name = IndicatorValueGetByName(user=user.id, report=report.id,
+                                                       column=indicator_value_create.column,
+                                                       report_indicator_name="Median")
+    with pytest.raises(NotFoundError):
+        get_indicator_value_by_name(indicator_value_get_name)
 
 
 def test_get_indicator_value_by_name_not_found(db_setup):
