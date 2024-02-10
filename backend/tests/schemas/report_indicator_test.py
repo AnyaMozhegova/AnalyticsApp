@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from backend.schemas.report_indicator import ReportIndicatorCreate, ReportIndicatorUpdate, validate_name
+from schemas.report_indicator import ReportIndicatorCreate, ReportIndicatorUpdate, validate_name
 
 
 @pytest.mark.parametrize("name", ["Median", "Some value", "a" * 10])
