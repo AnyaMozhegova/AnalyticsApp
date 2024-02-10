@@ -2,6 +2,8 @@ from mongoengine import DO_NOTHING, Document, ReferenceField, SequenceField, Str
 
 from models.role import Role
 
+from errors.not_found import NotFoundError
+
 
 class User(Document):
     id = SequenceField(primary_key=True)
@@ -12,10 +14,12 @@ class User(Document):
     role = ReferenceField(Role, reverse_delete_rule=DO_NOTHING)
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'email': self.email,
-            'is_active': self.is_active,
-            'role': self.role.name
-        }
+        if self.is_active:
+            return {
+                'id': self.id,
+                'name': self.name,
+                'email': self.email,
+                'role': self.role.name
+            }
+        else:
+            raise NotFoundError(f"Could not convert user with id = {self.id} to dict. The entity is not found")
