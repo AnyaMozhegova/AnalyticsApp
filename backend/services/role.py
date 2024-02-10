@@ -4,13 +4,6 @@ from schemas.role import RoleCreate, RoleUpdate
 from services.utils import check_admin_access, models_to_dict
 
 
-def create_role(user_id: int, role_create: RoleCreate) -> int:
-    check_admin_access(user_id)
-    role = Role(name=role_create.name)
-    role.save()
-    return role.id
-
-
 def get_roles(user_id: int):
     check_admin_access(user_id)
     roles = Role.objects()
