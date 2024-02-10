@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from backend.schemas.user import UserCreate, validate_name, validate_password
+from schemas.user import UserCreate, validate_name, validate_password
 
 
 @pytest.mark.parametrize("name", ["John", "a" * 20, "Jane Doe"])
@@ -31,8 +31,8 @@ def test_user_create_success():
     user_data = {
         "name": "John Doe",
         "email": "john@example.com",
-        "password": "Password@123",
-        "password_confirm": "Password@123",
+        "password": "Password!123",
+        "password_confirm": "Password!123",
         "is_active": True,
         "role": 1
     }
