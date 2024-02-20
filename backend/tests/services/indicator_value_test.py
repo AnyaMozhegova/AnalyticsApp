@@ -47,7 +47,7 @@ def create_columns() -> List[ReportColumn]:
 def create_report(user: User, columns: List[ReportColumn]) -> Report:
     report = Report(user=user, report_link="test_link", date_uploaded=datetime.strptime("01.01.2024", "%d.%m.%Y"),
                     columns=columns,
-                    fits_dispersion_analysis=False, fits_correlation_analysis=False)
+                    fits_discriminant_analysis=False, fits_correlation_analysis=False)
     report.save()
     return report
 
@@ -247,7 +247,7 @@ def test_get_indicator_values_column_in_different_report(db_setup):
                             indicator_values=[]).save()
     report_2 = Report(user=user, report_link="test_link", date_uploaded=datetime.strptime("02.02.2024", "%d.%m.%Y"),
                       columns=[column_3],
-                      fits_dispersion_analysis=False, fits_correlation_analysis=False)
+                      fits_discriminant_analysis=False, fits_correlation_analysis=False)
     report_2.save()
     different_report_column = column_3
     indicator_values_get = IndicatorValuesGet(user=user.id, report=report.id,
