@@ -13,7 +13,7 @@ class Report(Document):
     date_uploaded = DateTimeField(required=True)
     columns = ListField(ReferenceField(ReportColumn, reverse_delete_rule=PULL), required=True)
     fits_correlation_analysis = BooleanField(required=True)
-    fits_dispersion_analysis = BooleanField(required=True)
+    fits_discriminant_analysis = BooleanField(required=True)
     is_active = BooleanField(default=True)
 
     def to_dict(self):
@@ -25,7 +25,7 @@ class Report(Document):
                 'columns': ['' if not column else column.to_dict() for column in self.columns],
                 'date_uploaded': self.date_uploaded.strftime('%Y-%m-%d %H:%M:%S'),
                 'fits_correlation_analysis': self.fits_correlation_analysis,
-                'fits_dispersion_analysis': self.fits_dispersion_analysis
+                'fits_discriminant_analysis': self.fits_discriminant_analysis
             }
         else:
             raise NotFoundError(f"Could not convert report with id = {self.id} to dict. The entity is not found")
