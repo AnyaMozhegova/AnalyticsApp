@@ -6,8 +6,12 @@ from schemas.report_indicator import ReportIndicatorUpdate
 from services.utils import check_admin_access
 
 
-def get_report_indicators(user_id: int):
+def get_report_indicators_by_admin(user_id: int):
     check_admin_access(user_id)
+    return ReportIndicator.objects()
+
+
+def get_report_indicators():
     return ReportIndicator.objects()
 
 
