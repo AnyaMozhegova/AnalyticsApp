@@ -3,7 +3,7 @@ from errors.forbidden import ForbiddenError
 from errors.not_found import NotFoundError
 from mongoengine import NotUniqueError
 from schemas.report_indicator import ReportIndicatorUpdate
-from services.report_indicator import (get_report_indicator, get_report_indicator_by_name, get_report_indicators,
+from services.report_indicator import (get_report_indicator, get_report_indicator_by_name, get_report_indicators_by_admin,
                                        update_report_indicator)
 from tests.conftest import clean_up_test, connect_test, create_admin_user
 
@@ -26,7 +26,7 @@ def db_setup():
 
 def test_get_report_indicators(db_setup):
     _, _, admin_user = db_setup
-    indicators = get_report_indicators(user_id=admin_user.id)
+    indicators = get_report_indicators_by_admin(user_id=admin_user.id)
     print([indicator.to_dict() for indicator in indicators])
     assert len(indicators) == 2
 
@@ -35,7 +35,7 @@ def test_get_report_indicators_empty_database(db_setup):
     report_indicator_1, report_indicator_2, admin_user = db_setup
     report_indicator_1.delete()
     report_indicator_2.delete()
-    result = get_report_indicators(admin_user.id)
+    result = get_report_indicators_by_admin(admin_user.id)
     assert len(result) == 0, "Expected an empty list when no report indicators exist"
 
 
@@ -102,4 +102,4 @@ def test_unauthorized_access(mocker, db_setup):
                  side_effect=ForbiddenError("User doesn't have admin access"))
     _, _, admin_user = db_setup
     with pytest.raises(ForbiddenError):
-        get_report_indicators(user_id=admin_user.id + 1)
+        get_report_indicators_by_admin(user_id=admin_user.id + 1)
