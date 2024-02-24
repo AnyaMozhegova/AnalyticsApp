@@ -1,9 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
-from mongoengine import connect, disconnect, get_connection
 from main import app
-from models.user import User
+from models.admin import Admin
 from models.role import Role
+from models.user import User
+from mongoengine import get_connection
 
 
 @pytest.fixture(scope="module")
@@ -13,7 +14,6 @@ def test_client():
 
 
 import mongomock
-import pytest
 from mongoengine import connect, disconnect
 
 
@@ -32,15 +32,15 @@ def clean_up_test(db_name):
 
 
 def create_admin_user() -> User:
-    admin_role = Role(name='admin').save()
-    user = User(name='admin_user', email="admin@gmail.com", password="admin_password!123",
-                role=admin_role)
+    admin_role = Role(name='Admin').save()
+    user = Admin(name='admin_user', email="admin@gmail.com", password="admin_password!123",
+                 role=admin_role)
     user.save()
     return user
 
 
 def create_customer_user() -> User:
-    customer_role = Role(name='customer').save()
+    customer_role = Role(name='Customer').save()
     user = User(name='customer_user', email="customer@gmail.com", password="customer_password!123",
                 role=customer_role)
     user.save()
