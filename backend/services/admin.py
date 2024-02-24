@@ -31,10 +31,10 @@ def create_admin(admin_body: AdminCreate, current_user: User = Depends(get_curre
                               f"exists. Try to sign in")
     admin_password = generate_password()
     hashed_password = get_password_hash(admin_password)
-    admin_role = Role.objects(name='admin').first()
-    user = Admin(name=admin_body.name, email=admin_body.email, role=admin_role, parent_admin=admin_body.parent_admin,
-                 password=hashed_password)
-    user.save()
+    admin_role = Role.objects(name='Admin').first()
+    admin = Admin(name=admin_body.name, email=admin_body.email, role=admin_role, parent_admin=admin_body.parent_admin,
+                  password=hashed_password)
+    admin.save()
     response = create_token(admin_body.email, admin_password)
     content = json.loads(response.body)
     content['admin_password'] = admin_password

@@ -1,7 +1,6 @@
 import pytest
-from pydantic import ValidationError
 
-from schemas.user import UserCreate, validate_name, validate_password, CustomerCreate
+from schemas.user import UserCreate, validate_name, validate_password
 
 
 @pytest.mark.parametrize("name", ["John", "a" * 20, "Jane Doe"])
@@ -30,22 +29,8 @@ def test_validate_password_failure(password):
 def test_user_create_success():
     user_data = {
         "name": "John Doe",
-        "email": "john@example.com",
-        "password": "Password!123",
-        "password_confirm": "Password!123"
+        "email": "john@example.com"
     }
-    user = CustomerCreate(**user_data)
+    user = UserCreate(**user_data)
     assert user.name == user_data["name"]
     assert user.email == user_data["email"]
-    assert user.password == user_data["password"]
-
-
-def test_user_create_password_mismatch():
-    user_data = {
-        "name": "Jane Doe",
-        "email": "jane@example.com",
-        "password": "Password@123",
-        "password_confirm": "DifferentPassword@123"
-    }
-    with pytest.raises(ValidationError):
-        CustomerCreate(**user_data)

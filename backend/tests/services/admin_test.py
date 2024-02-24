@@ -6,19 +6,16 @@ from errors.forbidden import ForbiddenError
 from models.admin import Admin
 from models.role import Role
 from services.admin import validate_parent, create_admin, delete_admin, get_admin, get_admin_children, \
-    get_admin_children_by_current_user, get_admins
+    get_admin_children_by_current_user, get_admins, update_admin
 from tests.conftest import clean_up_test, connect_test
 
 from errors.not_found import NotFoundError
 
-from schemas.admin import AdminCreate, AdminDelete
+from schemas.admin import AdminCreate, AdminDelete, AdminUpdate
 
 from errors.bad_request import BadRequestError
 
 from services.utils import password_match_patterns
-
-from backend.schemas.admin import AdminUpdate
-from backend.services.admin import update_admin
 
 
 @pytest.fixture(scope="function")
@@ -43,7 +40,6 @@ def another_admin(admin_role: Role):
 
 GET_CURRENT_USER_PATH = 'services.user.get_current_user'
 GET_USER_BY_EMAIL_PATH = 'services.user.get_user_by_email'
-SEND_MESSAGE_PATH = 'services.user.send_message'
 
 
 def test_validate_parent_success(db_setup):

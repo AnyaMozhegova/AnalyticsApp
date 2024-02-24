@@ -1,5 +1,5 @@
 import re
-from typing import Annotated
+from typing import Annotated, Optional
 
 from pydantic import AfterValidator, BaseModel, EmailStr
 
@@ -37,15 +37,10 @@ class UserCreate(BaseModel):
     email: EmailStr
 
 
-class CustomerCreate(UserCreate):
-    password: Annotated[str, AfterValidator(validate_password)]
-    password_confirm: Annotated[str, AfterValidator(validate_password)]
-
-
 class UserUpdate(BaseModel):
-    name: Annotated[str, AfterValidator(validate_name)]
-    password: Annotated[str, AfterValidator(validate_password)]
-    password_confirm: Annotated[str, AfterValidator(validate_password)]
+    name: Optional[Annotated[str, AfterValidator(validate_name)]] = None
+    password: Optional[Annotated[str, AfterValidator(validate_password)]] = None
+    password_confirm: Optional[Annotated[str, AfterValidator(validate_password)]] = None
 
 
 class Token(BaseModel):
