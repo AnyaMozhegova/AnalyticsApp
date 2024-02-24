@@ -35,13 +35,24 @@ def validate_password(password: str) -> str:
 class UserCreate(BaseModel):
     name: Annotated[str, AfterValidator(validate_name)]
     email: EmailStr
+
+
+class CustomerCreate(UserCreate):
     password: Annotated[str, AfterValidator(validate_password)]
     password_confirm: Annotated[str, AfterValidator(validate_password)]
-    is_active: bool
-    role: int
 
 
 class UserUpdate(BaseModel):
     name: Annotated[str, AfterValidator(validate_name)]
     password: Annotated[str, AfterValidator(validate_password)]
     password_confirm: Annotated[str, AfterValidator(validate_password)]
+
+
+class Token(BaseModel):
+    access_token: str
+    id: int
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
