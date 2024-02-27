@@ -4,6 +4,8 @@ from errors.not_found import NotFoundError
 from models.report_column import ReportColumn
 from schemas.report_column import ReportColumnCreate
 
+from services.indicator_value import delete_indicator_value
+
 
 def create_report_column(report_column_create: ReportColumnCreate) -> int:
     report_column = ReportColumn(name=report_column_create.name,
@@ -18,6 +20,8 @@ def delete_report_column(report_column_id):
         raise NotFoundError(f"Could not delete report column. There is no such entity with id = {report_column_id}")
     report_column.is_active = False
     report_column.save()
+    for indicator_value in report_column.indicator_values:
+        delete_indicator_value(indicator_value.id)
 
 
 def get_report_columns() -> List[ReportColumn]:
