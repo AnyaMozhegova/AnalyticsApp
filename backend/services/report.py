@@ -7,13 +7,18 @@ import numpy as np
 import pandas as pd
 from errors.bad_request import BadRequestError
 from errors.not_found import NotFoundError
-from fastapi import UploadFile
+from fastapi import Depends, UploadFile
 from models.report import Report
 from models.report_column import ReportColumn
 from models.user import User
 from schemas.indicator_value import IndicatorValueCreate
 from services.indicator_value import create_indicator_value
 from services.report_indicator import get_report_indicators
+
+from models.customer import Customer
+from services.user import get_current_user
+
+from services.report_column import delete_report_column
 
 
 def delete_file(file_path: str):
@@ -126,15 +131,15 @@ def check_fits_correlation_analysis(report_columns: List[ReportColumn]) -> bool:
     return strengthened > weakened
 
 
-async def create_report(user_id: int, report_file: UploadFile) -> int:
-    if not (user := User.objects(id=user_id, is_active=True).first()):
-        raise NotFoundError(f"Could not upload report. There is no user with id = {user_id}")
-    file_path = await upload_report(user_id, report_file)
+async def create_report(report_file: UploadFile, current_user: User = Depends(get_current_user)) -> int:
+    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(f"Could not upload report. There is no customer {current_user}")
+    file_path = await upload_report(customer, report_file)
     saved_columns = validate_report_file(file_path)
     calculate_indicator_values(saved_columns)
     fits_discriminant_analysis = check_fits_discriminant_analysis(saved_columns)
     fits_correlation_analysis = check_fits_correlation_analysis(saved_columns)
-    report = Report(user=user, report_link=file_path, date_uploaded=datetime.now(), columns=saved_columns,
+    report = Report(user=current_user, report_link=file_path, date_uploaded=datetime.now(), columns=saved_columns,
                     fits_discriminant_analysis=fits_discriminant_analysis,
                     fits_correlation_analysis=fits_correlation_analysis).save()
     return report.id
@@ -148,11 +153,52 @@ def save_upload_file(upload_file: UploadFile, destination: str) -> str:
     return file_path
 
 
-async def upload_report(user_id: int, report_file: UploadFile):
+async def upload_report(customer: Customer, report_file: UploadFile):
     check_report_extension(report_file)
-    destination = f'{os.getcwd()}/user_data/{user_id}/report_files/'
+    destination = f'{os.getcwd()}/user_data/{customer.id}/report_files/'
     does_exists = os.path.exists(destination)
     if not does_exists:
         os.makedirs(destination)
     file_path = save_upload_file(report_file, destination)
     return file_path
+
+
+def get_current_customer_reports(current_user: User = Depends(get_current_user)) -> List[Report]:
+    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(f"Could not get customer reports for {current_user}. Customer does not exist.")
+    return Report.objects(is_active=True, user=customer).order_by('-date_uploaded')
+
+
+def get_customer_reports(customer_id: int) -> List[Report]:
+    if not (customer := Customer.objects(id=customer_id, is_active=True).first()):
+        raise NotFoundError(f"Could not get customer reports with id = {customer_id}. Customer does not exist.")
+    return Report.objects(is_active=True, user=customer).order_by('-date_uploaded')
+
+
+def get_current_customer_report(report_id: int, current_user: User = Depends(get_current_user)) -> Optional[Report]:
+    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(
+            f"Could not get customer report with id {report_id} for {current_user}. Customer does not exist.")
+    if not (report := Report.objects(id=report_id, is_active=True, user=customer).first()):
+        raise NotFoundError(f"Could not get customer report with id {report_id}. Report does not exist.")
+    return report
+
+
+def get_customer_report(report_id: int, customer_id: int) -> Optional[Report]:
+    if not (customer := Customer.objects(id=customer_id, is_active=True).first()):
+        raise NotFoundError(
+            f"Could not get customer report with id {report_id} for customer {customer_id}. Customer does not exist.")
+    if not (report := Report.objects(id=report_id, is_active=True, user=customer).first()):
+        raise NotFoundError(f"Could not get report with id {report_id}. Report does not exist.")
+    return report
+
+
+def delete_report(report_id: int, current_user: User = Depends(get_current_user)) -> None:
+    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(f"Could not delete customer {current_user}. Customer does not exist.")
+    if not (report := Report.objects(id=report_id, is_active=True, user=customer).first()):
+        raise NotFoundError(f"Could not delete report with id {report_id}. Report does not exist.")
+    report.is_active = False
+    report.save()
+    for report_column in report.columns:
+        delete_report_column(report_column.id)
