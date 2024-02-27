@@ -1,23 +1,15 @@
 import json
-from datetime import datetime
 
 import pytest
-from mock import patch
-
 from errors.bad_request import BadRequestError
 from errors.not_found import NotFoundError
-
+from mock import patch
 from models.customer import Customer
 from models.role import Role
-from models.report import Report
-from models.report_column import ReportColumn
-
-from tests.conftest import clean_up_test, connect_test
-
 from schemas.customer import CustomerCreate, CustomerUpdate
-
-from services.customer import create_customer, delete_customer, get_customer, get_customers, update_customer, \
-    get_current_customer, get_current_customer_reports, get_customer_reports
+from services.customer import create_customer, delete_customer, get_current_customer, get_customer, get_customers, \
+    update_customer
+from tests.conftest import clean_up_test, connect_test
 
 
 @pytest.fixture(scope="function")
@@ -34,14 +26,6 @@ def db_setup():
 def another_customer(customer_role: Role, is_active: bool = True):
     return Customer(name="Another Customer", email="another_customer@gmail.com", password="password",
                     role=customer_role, is_active=is_active)
-
-
-def create_report(customer: Customer, is_active: bool = True):
-    return Report(user=customer, report_link="link", date_uploaded=datetime.strptime("01.01.2024", "%d.%m.%Y"),
-                  columns=[ReportColumn(name="Column 1", column_data=[2.0, 1.0, 3.0, 6.0, None, None, 1.0],
-                                        indicator_values=[])], fits_discriminant_analysis=False,
-                  fits_correlation_analysis=False,
-                  is_active=is_active).save()
 
 
 GET_CURRENT_USER_PATH = 'services.user.get_current_user'
@@ -138,54 +122,6 @@ def test_get_customers_inactive(db_setup):
     result = get_customers()
     assert len(result) == 1
     assert result[0].id == customer.id
-
-
-def test_get_current_customer_reports(db_setup):
-    customer, _ = db_setup
-    report = create_report(customer, True)
-    with patch(GET_CURRENT_USER_PATH, return_value=customer):
-        result = get_current_customer_reports(customer)
-        assert len(result) == 1
-        assert result[0].id == report.id
-
-
-def test_get_current_customer_reports_inactive(db_setup):
-    customer, _ = db_setup
-    create_report(customer, False)
-    with patch(GET_CURRENT_USER_PATH, return_value=customer):
-        result = get_current_customer_reports(customer)
-        assert len(result) == 0
-
-
-def test_get_current_customer_reports_customer_not_found(db_setup):
-    customer, customer_role = db_setup
-    create_report(customer)
-    another_customer_entity = another_customer(customer_role)
-    with patch(GET_CURRENT_USER_PATH, return_value=another_customer_entity), pytest.raises(NotFoundError):
-        get_current_customer_reports(another_customer_entity)
-
-
-def test_get_customer_reports(db_setup):
-    customer, _ = db_setup
-    report = create_report(customer, True)
-    result = get_customer_reports(customer.id)
-    assert len(result) == 1
-    assert result[0].id == report.id
-
-
-def test_get_customer_reports_inactive(db_setup):
-    customer, _ = db_setup
-    create_report(customer, False)
-    result = get_customer_reports(customer.id)
-    assert len(result) == 0
-
-
-def test_get_customer_reports_customer_not_found(db_setup):
-    customer, customer_role = db_setup
-    create_report(customer)
-    another_customer_entity = another_customer(customer_role)
-    with pytest.raises(NotFoundError):
-        get_customer_reports(another_customer_entity.id)
 
 
 def test_update_customer_success(db_setup):

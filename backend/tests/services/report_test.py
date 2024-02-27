@@ -1,5 +1,6 @@
 import os
 import shutil
+from datetime import datetime
 from io import BytesIO
 from typing import List
 
@@ -9,12 +10,17 @@ import pytest
 from errors.bad_request import BadRequestError
 from errors.not_found import NotFoundError
 from fastapi import UploadFile
+from mock import patch
 from models.report_column import ReportColumn
 from services.report import calculate_strengthened_weakened_relationships, check_fits_correlation_analysis, \
     columns_to_df, check_column_names, check_report_extension, upload_report, validate_column_content, \
-    validate_report_file, check_fits_discriminant_analysis, create_report
+    validate_report_file, check_fits_discriminant_analysis, create_report, get_current_customer_reports, \
+    get_customer_reports, get_current_customer_report, get_customer_report, delete_report
 
-from tests.conftest import clean_up_test, connect_test, create_admin_user
+from tests.conftest import clean_up_test, connect_test, create_customer_user
+
+from models.customer import Customer
+from models.report import Report
 
 VALID_NAME = "valid.xlsx"
 INVALID_NAME = "invalid.xlsx"
@@ -34,13 +40,25 @@ def cleanup_files():
             os.remove(os.path.join('tests', file))
 
 
+def create_test_report(customer: Customer, is_active: bool = True):
+    columns = [ReportColumn(name="Column 1", column_data=[2.0, 1.0, 3.0, 6.0, None, None, 1.0],
+                            indicator_values=[]).save()]
+    return Report(user=customer, report_link="link", date_uploaded=datetime.strptime("01.01.2024", "%d.%m.%Y"),
+                  columns=columns, fits_discriminant_analysis=False,
+                  fits_correlation_analysis=False,
+                  is_active=is_active).save()
+
+
 @pytest.fixture(scope="function")
 def db_setup():
     connect_test(DB_NAME)
-    user = create_admin_user()
+    user = create_customer_user()
     yield user
     clean_up_test(DB_NAME)
     cleanup_files()
+
+
+GET_CURRENT_USER_PATH = 'services.user.get_current_user'
 
 
 def test_check_report_extension_valid(db_setup):
@@ -114,10 +132,10 @@ def test_validate_column_content_with_empty_column(db_setup):
 
 @pytest.mark.asyncio
 async def test_upload_report_valid_file(db_setup):
-    user_id = db_setup.id
+    user = db_setup
     data = pd.DataFrame({'A': [1, 2, 3, 4, 7, 7], 'B': [4, 5, 6, 7, 7, 7]})
     file = create_upload_file(VALID_NAME, data)
-    file_path = await upload_report(user_id, file)
+    file_path = await upload_report(user, file)
     try:
         validate_report_file(file_path)
         assert os.path.exists(file_path)
@@ -127,11 +145,11 @@ async def test_upload_report_valid_file(db_setup):
 
 @pytest.mark.asyncio
 async def test_upload_report_with_empty_column(db_setup):
-    user_id = db_setup.id
+    user = db_setup
     data = pd.DataFrame(
         {'A': [1, 2, 3, 4, 5, 5], 'B': [4, 5, 6, 7, 7, 7], 'C': [np.nan, np.nan, np.nan, 3, 4, 5]})
     file = create_upload_file(VALID_NAME, data)
-    file_path = await upload_report(user_id, file)
+    file_path = await upload_report(user, file)
     try:
         validate_report_file(file_path)
         assert os.path.exists(file_path)
@@ -141,10 +159,10 @@ async def test_upload_report_with_empty_column(db_setup):
 
 @pytest.mark.asyncio
 async def test_upload_report_invalid_names(db_setup):
-    user_id = db_setup.id
+    user = db_setup
     data = pd.DataFrame({' ': [1, 2, 3, 4], 'B': [4, 5, 6, 7]})
     file = create_upload_file(INVALID_NAME, data)
-    file_path = await upload_report(user_id, file)
+    file_path = await upload_report(user, file)
     with pytest.raises(BadRequestError):
         validate_report_file(file_path)
         assert os.path.exists(file_path) is False
@@ -206,21 +224,167 @@ def test_check_fits_discriminant_analysis_true(db_setup):
 
 
 @pytest.mark.asyncio
-async def create_report_success(db_setup):
+async def test_create_report_success(db_setup):
     user = db_setup
     report_columns = mock_report_columns()
     df = columns_to_df(report_columns)
     file = create_upload_file(VALID_NAME, df)
-    report_id = await create_report(user.id, file)
+    report_id = await create_report(file, user)
     assert isinstance(report_id, int)
     assert report_id is not None
 
 
 @pytest.mark.asyncio
-async def create_report_failure(db_setup):
-    user = db_setup
+async def test_create_report_failure(db_setup):
     report_columns = mock_report_columns()
     df = columns_to_df(report_columns)
     file = create_upload_file(VALID_NAME, df)
     with pytest.raises(NotFoundError):
-        await create_report(user.id + 1, file)
+        await create_report(file, None)
+
+
+def test_get_current_customer_reports(db_setup):
+    customer = db_setup
+    report = create_test_report(customer, True)
+    with patch(GET_CURRENT_USER_PATH, return_value=customer):
+        result = get_current_customer_reports(customer)
+        assert len(result) == 1
+        assert result[0].id == report.id
+
+
+def test_get_current_customer_reports_inactive(db_setup):
+    customer = db_setup
+    create_test_report(customer, False)
+    with patch(GET_CURRENT_USER_PATH, return_value=customer):
+        result = get_current_customer_reports(customer)
+        assert len(result) == 0
+
+
+def test_get_current_customer_reports_customer_not_found(db_setup):
+    customer = db_setup
+    create_test_report(customer)
+    with patch(GET_CURRENT_USER_PATH, return_value=None), pytest.raises(NotFoundError):
+        get_current_customer_reports(None)
+
+
+def test_get_customer_reports(db_setup):
+    customer = db_setup
+    report = create_test_report(customer, True)
+    result = get_customer_reports(customer.id)
+    assert len(result) == 1
+    assert result[0].id == report.id
+
+
+def test_get_customer_reports_inactive(db_setup):
+    customer = db_setup
+    create_test_report(customer, False)
+    result = get_customer_reports(customer.id)
+    assert len(result) == 0
+
+
+def test_get_customer_reports_customer_not_found(db_setup):
+    customer = db_setup
+    create_test_report(customer)
+    with pytest.raises(NotFoundError):
+        get_customer_reports(customer.id + 1000)
+
+
+def test_get_current_customer_report(db_setup):
+    customer = db_setup
+    report = create_test_report(customer, True)
+    with patch(GET_CURRENT_USER_PATH, return_value=customer):
+        result = get_current_customer_report(report.id, customer)
+        assert result is not None
+        assert result.id == report.id
+
+
+def test_get_current_customer_report_inactive(db_setup):
+    customer = db_setup
+    report = create_test_report(customer, False)
+    with patch(GET_CURRENT_USER_PATH, return_value=customer), pytest.raises(NotFoundError):
+        get_current_customer_report(report.id, customer)
+
+
+def test_get_current_customer_report_customer_not_found(db_setup):
+    customer = db_setup
+    report = create_test_report(customer)
+    with patch(GET_CURRENT_USER_PATH, return_value=None), pytest.raises(NotFoundError):
+        get_current_customer_report(report.id, None)
+
+
+def test_get_current_customer_report_not_found(db_setup):
+    customer = db_setup
+    report = create_test_report(customer)
+    with patch(GET_CURRENT_USER_PATH, return_value=None), pytest.raises(NotFoundError):
+        get_current_customer_report(report.id + 1000, customer)
+
+
+def test_get_customer_report(db_setup):
+    customer = db_setup
+    report = create_test_report(customer, True)
+    result = get_customer_report(report.id, customer.id)
+    assert result is not None
+    assert result.id == report.id
+
+
+def test_get_customer_report_inactive(db_setup):
+    customer = db_setup
+    report = create_test_report(customer, False)
+    with pytest.raises(NotFoundError):
+        get_customer_report(report.id, customer.id)
+
+
+def test_get_customer_report_customer_not_found(db_setup):
+    customer = db_setup
+    report = create_test_report(customer)
+    with pytest.raises(NotFoundError):
+        get_customer_report(report.id, customer.id + 1000)
+
+
+def test_get_customer_report_not_found(db_setup):
+    customer = db_setup
+    report = create_test_report(customer)
+    with pytest.raises(NotFoundError):
+        get_customer_report(report.id + 1000, customer.id)
+
+
+def test_delete_report(db_setup):
+    customer = db_setup
+    report = create_test_report(customer)
+    delete_report(report.id, customer)
+    deleted_report = Report.objects(id=report.id).first()
+    assert deleted_report is not None
+    assert deleted_report.is_active is False
+    deleted_columns = ReportColumn.objects(id__in=list(map(lambda report_column: report_column.id, report.columns)))
+    for deleted_column in deleted_columns:
+        assert deleted_column is not None
+        assert deleted_column.is_active is False
+
+
+def test_delete_report_inactive(db_setup):
+    customer = db_setup
+    report = create_test_report(customer, False)
+    with pytest.raises(NotFoundError):
+        delete_report(report.id, customer)
+        not_deleted_report = Report.objects(id=report.id).first()
+        assert not_deleted_report is not None
+        assert not_deleted_report.is_active is False
+        not_deleted_columns = ReportColumn.objects(
+            id__in=list(map(lambda report_column: report_column.id, report.columns)))
+        for not_deleted_column in not_deleted_columns:
+            assert not_deleted_column is not None
+            assert not_deleted_column.is_active is True
+
+
+def test_delete_report_not_found(db_setup):
+    customer = db_setup
+    report = create_test_report(customer)
+    with pytest.raises(NotFoundError):
+        delete_report(report.id + 1000, customer)
+
+
+def test_delete_report_customer_not_found(db_setup):
+    customer = db_setup
+    report = create_test_report(customer)
+    with pytest.raises(NotFoundError):
+        delete_report(report.id, None)

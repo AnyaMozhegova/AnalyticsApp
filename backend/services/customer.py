@@ -27,12 +27,14 @@ def create_customer(customer_body: CustomerCreate) -> JSONResponse:
     customer = Customer(name=customer_body.name, email=customer_body.email, role=customer_role, is_active=True,
                         password=hashed_password)
     customer.save()
-    return create_token(customer_body.email, customer_body.password)
+    response = create_token(customer_body.email, customer_body.password)
+    response.status_code = 201
+    return response
 
 
 def delete_customer(current_user: User = Depends(get_current_user)) -> None:
-    if not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
-        raise NotFoundError(f"Could not delete customer with id = {current_user.id}. Customer does not exist.")
+    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(f"Could not delete customer {current_user}. Customer does not exist.")
     customer.is_active = False
     customer.save()
 
@@ -45,7 +47,7 @@ def get_customer(customer_id: int) -> Optional[Customer]:
 
 def get_current_customer(current_user: User = Depends(get_current_user)) -> Optional[Customer]:
     if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
-        raise NotFoundError(f"Could not get customer with id = {current_user.id}. Customer does not exist.")
+        raise NotFoundError(f"Could not get customer {current_user}. Customer does not exist.")
     return customer
 
 
@@ -53,20 +55,9 @@ def get_customers() -> List[Customer]:
     return Customer.objects(is_active=True)
 
 
-def get_current_customer_reports(current_user: User = Depends(get_current_user)) -> List[Report]:
-    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
-        raise NotFoundError(f"Could not get customer reports with id = {current_user.id}. Customer does not exist.")
-    return Report.objects(is_active=True, user=customer)
-
-
-def get_customer_reports(customer_id: int) -> List[Report]:
-    if not (customer := Customer.objects(id=customer_id, is_active=True).first()):
-        raise NotFoundError(f"Could not get customer reports with id = {customer_id}. Customer does not exist.")
-    return Report.objects(is_active=True, user=customer)
-
-
 def update_customer(customer_update: CustomerUpdate, current_user: User = Depends(get_current_user)) -> None:
-    customer_to_update = Customer.objects(id=current_user.id, is_active=True).first()
+    if not current_user or not (customer_to_update := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(f"Could not update customer {current_user}. Customer does not exist.")
     if customer_update.name:
         customer_to_update.name = customer_update.name
     if customer_update.password:
