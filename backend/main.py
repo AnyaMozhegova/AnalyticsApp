@@ -3,10 +3,15 @@
 import logging
 import os
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordRequestForm
+from mongoengine import connect
 from starlette.requests import Request
 from starlette.responses import Response
-from mongoengine import connect
+
+from routers.customer import router as CustomerRouter
+from routers.report import router as ReportRouter
+from services.user import create_token
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:  %(asctime)s  %(message)s",
@@ -15,7 +20,10 @@ logging.basicConfig(level=logging.INFO,
 app = FastAPI(docs_url=None, redoc_url=None)
 
 MONGODB_URL = os.getenv("MONGODB_URL")
-connect(host=MONGODB_URL)
+connect(host="MONGODB_URL")
+
+app.include_router(ReportRouter)
+app.include_router(CustomerRouter)
 
 
 @app.middleware("http")
@@ -34,6 +42,11 @@ async def add_cors_headers(request: Request, call_next):
 @app.get("/")
 async def root():
     logging.info("Root application started successfully")
+
+
+@app.post("/login")
+async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
+    return create_token(form_data.username, form_data.password)
 
 
 @app.options("/{full_path:path}")
