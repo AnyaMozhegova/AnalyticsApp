@@ -13,6 +13,8 @@ from services.user import create_token, get_current_user, get_password_hash, get
 from services.utils import check_admin_access, generate_password
 from starlette.responses import JSONResponse
 
+from models.customer import Customer
+
 
 def validate_parent(current_user: User, parent_admin_id: int, error_message: str):
     if not (parent_admin := Admin.objects(id=parent_admin_id, is_active=True).first()):
@@ -50,6 +52,15 @@ def delete_admin(admin_delete: AdminDelete, current_user: User = Depends(get_cur
         deleted_admin.save()
     else:
         raise ForbiddenError(f"Could not delete admin with id = {admin_delete.admin_to_delete}. Admin is a root admin")
+
+
+def delete_customer_by_admin(customer_id: int, current_user: User = Depends(get_current_user)) -> None:
+    if not current_user or not Admin.objects(id=current_user.id, is_active=True).first():
+        raise NotFoundError(f"Could not delete customer with id {customer_id}. Current user is not a valid admin.")
+    if not (customer := Customer.objects(id=customer_id, is_active=True).first()):
+        raise NotFoundError(f"Could not delete customer with id {customer_id}. Customer does not exist.")
+    customer.is_active = False
+    customer.save()
 
 
 def get_admin(admin_id: int) -> Optional[Admin]:
