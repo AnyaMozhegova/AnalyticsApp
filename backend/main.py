@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO,
 app = FastAPI(docs_url=None, redoc_url=None)
 
 MONGODB_URL = os.getenv("MONGODB_URL")
-connect(host="MONGODB_URL")
+connect(host=MONGODB_URL)
 
 app.include_router(report_router)
 app.include_router(customer_router)
