@@ -1,7 +1,9 @@
 import logging
+
+from pydantic import EmailStr
 from starlette import status
 from starlette.responses import JSONResponse
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 
 from errors.bad_request import BadRequestError
@@ -27,7 +29,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @router.post("/sign_up", status_code=status.HTTP_201_CREATED)
-def sign_up_route(customer_body: CustomerCreate):
+def sign_up_route(name: str = Form(...), email: EmailStr = Form(...), password: str = Form(...),
+                  password_confirm: str = Form(...)):
+    customer_body: CustomerCreate = CustomerCreate(name=name, email=email, password=password,
+                                                   password_confirm=password_confirm)
     try:
         return create_customer(customer_body)
     except BadRequestError as e:

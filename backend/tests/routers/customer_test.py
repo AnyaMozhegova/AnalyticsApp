@@ -68,7 +68,7 @@ def test_login_for_access_token(client_setup):
 
 def test_sign_up_customer_success(client_setup):
     client, _ = client_setup
-    response = client.post(SIGN_UP_ENDPOINT, json={"name": "test customer",
+    response = client.post(SIGN_UP_ENDPOINT, data={"name": "test customer",
                                                    "email": "testcustomer@gmail.com",
                                                    "password": NEW_PASSWORD,
                                                    "password_confirm": NEW_PASSWORD})
@@ -79,7 +79,7 @@ def test_sign_up_customer_success(client_setup):
 
 def test_sign_up_customer_already_exists(client_setup):
     client, user = client_setup
-    response = client.post(SIGN_UP_ENDPOINT, json={"name": "Existed customer",
+    response = client.post(SIGN_UP_ENDPOINT, data={"name": "Existed customer",
                                                    "email": user.email,
                                                    "password": NEW_PASSWORD,
                                                    "password_confirm": NEW_PASSWORD})
@@ -88,7 +88,7 @@ def test_sign_up_customer_already_exists(client_setup):
 
 def test_sign_up_customer_invalid_create(client_setup):
     client, _ = client_setup
-    response = client.post(SIGN_UP_ENDPOINT, json={"name": "Invalid customer",
+    response = client.post(SIGN_UP_ENDPOINT, data={"name": "Invalid customer",
                                                    "email": "testcustomer@gmail.com",
                                                    "password": NEW_PASSWORD,
                                                    "password_confirm": "WrongPa$$word1"})
