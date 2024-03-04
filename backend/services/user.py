@@ -100,7 +100,7 @@ def create_token(email: str, password: str) -> JSONResponse:
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    response = JSONResponse(content={"id": user.id})
+    response = JSONResponse(content={"id": user.id, "role": user.role.name.lower()})
     response.set_cookie(key="session", value=access_token, expires=ACCESS_TOKEN_EXPIRE_SECONDS, samesite="none",
                         secure=True, httponly=True, domain=BACKEND_DOMAIN)
     return response
