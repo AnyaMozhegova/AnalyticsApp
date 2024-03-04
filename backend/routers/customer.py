@@ -9,7 +9,8 @@ from errors.not_found import NotFoundError
 from models.user import User
 from passlib.context import CryptContext
 from schemas.customer import CustomerCreate, CustomerUpdate
-from services.customer import create_customer, delete_customer, get_current_customer, update_customer
+from services.customer import create_customer, delete_customer, get_current_customer, update_customer, \
+    delete_customer_by_admin, get_customers
 from services.report import create_report
 from services.user import get_current_user
 
@@ -49,6 +50,22 @@ def get_current_customer_route(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
+@router.delete("/{customer_id}", status_code=status.HTTP_200_OK)
+def delete_customer_by_admin_route(customer_id: int, current_user: User = Depends(get_current_user)):
+    try:
+        delete_customer_by_admin(customer_id, current_user)
+    except NotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.get("/", status_code=status.HTTP_200_OK)
+def get_customers_route(current_user: User = Depends(get_current_user)):
+    try:
+        return JSONResponse(content=get_customers(current_user).to_json())  # type: ignore
+    except NotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
 @router.put("/me", status_code=status.HTTP_200_OK)
 def update_customer_route(customer_body: CustomerUpdate, current_user: User = Depends(get_current_user)):
     try:
@@ -67,4 +84,3 @@ async def upload_report_route(report: UploadFile, current_user: User = Depends(g
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except BadRequestError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-

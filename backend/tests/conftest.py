@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytest
 from fastapi.testclient import TestClient
 from main import app
@@ -45,3 +47,19 @@ def create_customer_user() -> Customer:
     customer_role = Role(name='Customer').save()
     return Customer(name='customer_user', email="customer@gmail.com", password=CUSTOMER_PASSWORD,
                     role=customer_role).save()
+
+
+def another_customer(is_active: bool = True):
+    if not (customer_role := Role.objects(name='Customer').first()):
+        customer_role = Role(name='Customer').save()
+    return Customer(name="Another Customer", email="another_customer@gmail.com", password="password",
+                    role=customer_role, is_active=is_active)
+
+
+def another_admin(parent_admin: Optional[Admin] = None, is_active: bool = True):
+    if not (admin_role := Role.objects(name='Admin').first()):
+        admin_role = Role(name='Admin').save()
+    if parent_admin:
+        return Admin(name="Test Admin", email="testadmin@gmail.com",
+                     parent_admin=parent_admin.id, password="password", role=admin_role, is_active=is_active)
+    return Admin(name="Test Admin", email="testadmin@gmail.com", password="password", role=admin_role, is_active=True)

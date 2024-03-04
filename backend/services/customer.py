@@ -1,18 +1,16 @@
 from typing import List, Optional
-from fastapi import Depends
-from starlette.responses import JSONResponse
 
 from errors.bad_request import BadRequestError
 from errors.not_found import NotFoundError
-
+from fastapi import Depends
 from models.customer import Customer
 from models.role import Role
 from models.user import User
-from models.report import Report
-
 from schemas.customer import CustomerCreate, CustomerUpdate
-
 from services.user import create_token, get_current_user, get_password_hash, get_user_by_email
+from starlette.responses import JSONResponse
+
+from models.admin import Admin
 
 
 def create_customer(customer_body: CustomerCreate) -> JSONResponse:
@@ -39,6 +37,15 @@ def delete_customer(current_user: User = Depends(get_current_user)) -> None:
     customer.save()
 
 
+def delete_customer_by_admin(customer_id: int, current_user: User = Depends(get_current_user)) -> None:
+    if not current_user or not Admin.objects(id=current_user.id, is_active=True).first():
+        raise NotFoundError(f"Could not delete customer with id {customer_id}. Current user is not a valid admin.")
+    if not (customer := Customer.objects(id=customer_id, is_active=True).first()):
+        raise NotFoundError(f"Could not delete customer with id {customer_id}. Customer does not exist.")
+    customer.is_active = False
+    customer.save()
+
+
 def get_customer(customer_id: int) -> Optional[Customer]:
     if not (customer := Customer.objects(id=customer_id, is_active=True).first()):
         raise NotFoundError(f"Could not get customer with id = {customer_id}. Customer does not exist.")
@@ -51,7 +58,9 @@ def get_current_customer(current_user: User = Depends(get_current_user)) -> Opti
     return customer
 
 
-def get_customers() -> List[Customer]:
+def get_customers(current_user: User = Depends(get_current_user)) -> List[Customer]:
+    if not current_user or not Admin.objects(id=current_user.id, is_active=True).first():
+        raise NotFoundError("Could not get customers. Current user is not a valid admin")
     return Customer.objects(is_active=True)
 
 
