@@ -12,7 +12,7 @@ from main import app
 from models.customer import Customer
 from models.role import Role
 from services.user import get_current_user
-from tests.conftest import clean_up_test, connect_test, create_customer_user
+from tests.conftest import clean_up_test, connect_test, create_customer_user, create_admin_user
 
 
 def not_found_customer():
@@ -122,6 +122,43 @@ def test_delete_customer_not_found(client_setup):
     client, _ = client_setup
     app.dependency_overrides[get_current_user] = not_found_customer
     response = client.delete(ME_ENDPOINT)
+    assert response.status_code == 404
+
+
+def test_delete_customer_by_admin_success(client_setup):
+    client, user = client_setup
+    admin = create_admin_user()
+    app.dependency_overrides[get_current_user] = lambda: admin
+    response = client.delete(f"customer/{user.id}")
+    assert response.status_code == 200
+
+
+def test_delete_customer_by_admin_not_found(client_setup):
+    client, user = client_setup
+    admin = create_admin_user()
+    app.dependency_overrides[get_current_user] = lambda: admin
+    response = client.delete(f"customer/{user.id + 100}")
+    assert response.status_code == 404
+
+
+def test_get_customers_by_admin_success(client_setup):
+    client, user = client_setup
+    admin = create_admin_user()
+    app.dependency_overrides[get_current_user] = lambda: admin
+    response = client.get("/customer/")
+    assert response.status_code == 200
+    content = json.loads(response.json())
+    assert len(content) == 1
+    assert content[0]["_id"] == user.id
+
+
+def test_get_customers_by_admin_not_found(client_setup):
+    client, _ = client_setup
+    admin = create_admin_user()
+    admin.is_active = False
+    admin.save()
+    app.dependency_overrides[get_current_user] = lambda: admin
+    response = client.get("customer/")
     assert response.status_code == 404
 
 
