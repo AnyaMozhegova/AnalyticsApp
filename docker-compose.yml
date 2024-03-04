@@ -29,6 +29,20 @@ services:
     networks:
       - app-network
 
+
+  app-frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - app-backend
+    image: app-frontend
+    container_name: app-frontend
+    restart: always
+    ports:
+      - "3001:8000"
+    networks:
+      - app-network
+
 networks:
   app-network:
 

@@ -1,0 +1,12 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "dependencies": {
+    "node-fetch": "^3.3.1",
+    "dotenv": "^16.3.1",
+    "sweetalert2": "^11.10.4"
+  },
+  "scripts": {
+    "start": "node http-server.js -p 3000"
+  }
+}
