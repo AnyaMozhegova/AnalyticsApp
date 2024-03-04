@@ -9,8 +9,9 @@ from mongoengine import connect
 from starlette.requests import Request
 from starlette.responses import Response
 
-from routers.customer import router as CustomerRouter
-from routers.report import router as ReportRouter
+from routers.customer import router as customer_router
+from routers.report import router as report_router
+from routers.admin import router as admin_router
 from services.user import create_token
 
 logging.basicConfig(level=logging.INFO,
@@ -22,8 +23,9 @@ app = FastAPI(docs_url=None, redoc_url=None)
 MONGODB_URL = os.getenv("MONGODB_URL")
 connect(host="MONGODB_URL")
 
-app.include_router(ReportRouter)
-app.include_router(CustomerRouter)
+app.include_router(report_router)
+app.include_router(customer_router)
+app.include_router(admin_router)
 
 
 @app.middleware("http")
