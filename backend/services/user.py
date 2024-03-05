@@ -12,11 +12,11 @@ from passlib.context import CryptContext
 from schemas.user import TokenData
 from starlette import status
 from starlette.responses import JSONResponse
+from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO,
                     format="%(levelname)s:%(asctime)s%(message)s",
                     datefmt="%Y-%m-%d %H:%M:%S")
-from dotenv import load_dotenv
 
 dotenv_path = '.env'
 load_dotenv(dotenv_path=dotenv_path)
@@ -26,7 +26,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = os.getenv('ALGORITHM')
-BACKEND_DOMAIN = os.getenv('BACKEND_DOMAIN')
 ACCESS_TOKEN_EXPIRE_SECONDS = int(os.getenv('ACCESS_TOKEN_EXPIRE_SECONDS'))
 
 
@@ -101,8 +100,8 @@ def create_token(email: str, password: str) -> JSONResponse:
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     response = JSONResponse(content={"id": user.id, "role": user.role.name.lower()})
-    response.set_cookie(key="session", value=access_token, expires=ACCESS_TOKEN_EXPIRE_SECONDS, samesite="none",
-                        secure=True, httponly=True, domain=BACKEND_DOMAIN)
+    response.set_cookie(key="session", value=access_token, expires=ACCESS_TOKEN_EXPIRE_SECONDS, samesite="lax",
+                        secure=False, httponly=True)
     return response
 
 
