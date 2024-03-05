@@ -26,18 +26,19 @@ connect(host=MONGODB_URL)
 app.include_router(report_router)
 app.include_router(customer_router)
 app.include_router(admin_router)
+FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 
 @app.middleware("http")
 async def add_cors_headers(request: Request, call_next):
     response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Origin"] = FRONTEND_URL
+    response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Allow-Methods"] = "*"
     response.headers["Access-Control-Request-Method"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    response.headers["Access-Control-Request-Headers"] = "content-type"
+    response.headers[
+        "Access-Control-Allow-Headers"] = "content-type, hx-request, hx-current-url, set-cookie, hx-trigger, hx-target"
     response.headers["Access-Control-Allow-Private-Network"] = "true"
-    response.headers["Access-Control-Max-Age"] = "86400"
     return response
 
 
@@ -53,7 +54,7 @@ async def login_for_access_token(response: Response, form_data: OAuth2PasswordRe
 
 @app.options("/{full_path:path}")
 def options_handler(r: Request, full_path: str | None):
-    headers = {"Access-Control-Allow-Origin": "*",
+    headers = {"Access-Control-Allow-Origin": FRONTEND_URL,
                "Access-Control-Allow-Methods": "*",
-               "Access-Control-Allow-Headers": "Content-Type"}
+               "Access-Control-Allow-Headers": "content-type, hx-request, hx-current-url, set-cookie, hx-trigger, hx-target"}
     return Response(status_code=200, headers=headers)

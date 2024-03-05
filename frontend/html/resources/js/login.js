@@ -13,8 +13,8 @@ document.body.addEventListener('htmx:afterOnLoad', function (event) {
                 confirmButtonText: 'OK'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    if (response.role === "customer")  window.location.href = 'http://0.0.0.0:3001/home';
-                    else if (response.role === "admin") window.location.href = 'http://0.0.0.0:3001/admin_home';
+                    if (response.role === "customer")  window.location.href = 'http://localhost:3001/home';
+                    else if (response.role === "admin") window.location.href = 'http://localhost:3001/admin_home';
                 }
             });
         }
