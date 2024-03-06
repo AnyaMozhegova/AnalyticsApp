@@ -59,10 +59,10 @@ def validate_column_content(df, column, saved_columns: List[ReportColumn]):
         except ValueError:
             valid_column = False
             break
+    if not valid_column:
+        raise BadRequestError("Could not save file. Dataset contains non numeric data")
     present_floats = [value for value in column_data_floats if value]
-    if len(present_floats) < 3:
-        raise BadRequestError("Each column should have at least 3 non-NAN numeric values")
-    if valid_column and any(isinstance(x, float) for x in column_data_floats):
+    if valid_column and any(isinstance(x, float) for x in column_data_floats) and len(present_floats) >= 3:
         save_column(column, column_data_floats, saved_columns)
 
 
@@ -74,10 +74,11 @@ def validate_report_file(file_path: str) -> List[ReportColumn]:
     except BadRequestError as e:
         delete_file(file_path)
         raise BadRequestError(e)
-
     for column in df.columns:
         validate_column_content(df, column, saved_columns)
-
+    if len(saved_columns) == 0:
+        delete_file(file_path)
+        raise BadRequestError("Could not save file. There is no valid columns in the dataset")
     return saved_columns
 
 
@@ -202,3 +203,14 @@ def delete_report(report_id: int, current_user: User = Depends(get_current_user)
     report.save()
     for report_column in report.columns:
         delete_report_column(report_column.id)
+
+
+def get_report_file(report_id: int, current_user: User = Depends(get_current_user)) -> str:
+    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(f"Could not get report file with id = {report_id}. Customer does not exist.")
+    if not (report := Report.objects(id=report_id, is_active=True, user=customer).first()):
+        raise NotFoundError(f"Could not get report file with id {report_id}. Report does not exist.")
+    file_path = report.report_link
+    if not os.path.exists(file_path):
+        raise NotFoundError(f"Could not get report file with id {report_id}. File does not exist.")
+    return report.report_link

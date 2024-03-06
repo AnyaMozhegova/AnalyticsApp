@@ -1,12 +1,13 @@
 import logging
+import os
 
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
-from starlette.responses import JSONResponse
+from starlette.responses import FileResponse, JSONResponse, Response
 
 from errors.not_found import NotFoundError
 from models.user import User
-from services.report import get_current_customer_report, get_current_customer_reports, delete_report
+from services.report import get_current_customer_report, get_current_customer_reports, delete_report, get_report_file
 from services.user import get_current_user
 
 logging.basicConfig(level=logging.INFO,
@@ -21,7 +22,7 @@ router = APIRouter(prefix="/report",
 @router.get("/", status_code=status.HTTP_200_OK)
 def get_reports_route(current_user: User = Depends(get_current_user)):
     try:
-        return JSONResponse(content=get_current_customer_reports(current_user).to_json())
+        return Response(content=get_current_customer_reports(current_user).to_json())
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -42,3 +43,9 @@ def delete_report_route(report_id: int, current_user: User = Depends(get_current
                             content=delete_report(report_id, current_user))
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.get("/{report_id}/file")
+async def get_report_file_route(report_id: int, current_user: User = Depends(get_current_user)):
+    file_path = get_report_file(report_id, current_user)
+    return FileResponse(path=file_path, filename=os.path.basename(file_path), media_type='application/octet-stream')
