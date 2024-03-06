@@ -43,7 +43,7 @@ def test_get_reports_success(client_setup):
     app.dependency_overrides[get_current_user] = lambda: user
     response = client.get("/report/")
     assert response.status_code == 200
-    report_response = json.loads(response.json())
+    report_response = json.loads(response.content.decode("utf-8"))
     assert len(report_response) == 1
     assert report_response[0]['_id'] == report.id
 

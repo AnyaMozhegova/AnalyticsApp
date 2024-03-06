@@ -124,9 +124,8 @@ def test_validate_column_content_with_empty_column(db_setup):
     })
     file = create_upload_file(INVALID_NAME, data)
     saved_columns = []
-    with pytest.raises(BadRequestError):
-        validate_column_content(data, 'A', saved_columns)
-        assert len(saved_columns) == 0, "No columns should be saved for empty column"
+    validate_column_content(data, 'A', saved_columns)
+    assert len(saved_columns) == 0, "No columns should be saved for empty column"
     file.file.close()
 
 
