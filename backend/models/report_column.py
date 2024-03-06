@@ -8,7 +8,7 @@ from custom_types.nullable_floatField import NullableFloatField
 
 class ReportColumn(Document):
     id = SequenceField(primary_key=True)
-    name = StringField(unique=True, required=True)
+    name = StringField(required=True)
     column_data = ListField(NullableFloatField(), required=True)
     indicator_values = ListField(ReferenceField(IndicatorValue, reverse_delete_rule=PULL))
     is_active = BooleanField(default=True)
