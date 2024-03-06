@@ -26,7 +26,7 @@ document.body.addEventListener('htmx:afterOnLoad', function (event) {
                 confirmButtonText: 'OK'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'http://0.0.0.0:3001/home';
+                    window.location.href = 'http://localhost:3001/home';
                 }
             });
         }

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Home Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="html/resources/css/home.css" rel="stylesheet">
+    <script src="html/resources/js/customer.js"></script>
+</head>
+<body class="abstract-background justify-center items-center min-h-screen flex flex-col">
+    <nav class="bg-transparent flex justify-between items-center w-full p-4">
+        <a href="#" class="text-white text-4xl font-bold">Analytics App</a>
+        <div>
+            <a href="http://localhost:3001/upload" class="text-white pr-4">Upload Dataset</a>
+            <div class="dropdown inline-block relative">
+                <button class="text-white py-2 px-4 rounded inline-flex items-center">
+                    <span class="mr-1">Personal Cabinet</span>
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c-2-2-5.516-1.795-5.516-1.795S4.258.999 7.258.999c3 0 5.677 2.25 7 2.25 1.323 0 4-2.25 7-2.25 3 0 5.677 4.754 5.677 4.754s-3.516-.205-5.516 1.795c-2 2-1.84 5.365-1.84 5.365S13.677 7.548 10 7.548c-3.678 0-4.484 5.365-4.484 5.365S7.516 9.548 5.516 7.548z"/></svg>
+                </button>
+                <ul class="dropdown-menu absolute hidden text-gray-700 pt-1">
+                    <li class=""><a class="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap" href="#">Settings</a></li>
+                    <li class=""><a class="rounded-b bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap" href="#">Exit</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="flex-grow container mx-auto px-4">
+        <h1 class="text-white text-xl font-bold my-4">Reports</h1>
+        <table class="table-auto w-full">
+            <thead>
+                <tr>
+                    <th class="text-white">Date Uploaded</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="reports-body">
+            </tbody>
+        </table>
+    </div>
+<script src="html/resources/js/home.js"></script>
+</body>
+</html>

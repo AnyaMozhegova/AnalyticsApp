@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Dataset</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="html/resources/css/login.css" rel="stylesheet">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="html/resources/js/customer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body class="abstract-background justify-center items-center min-h-screen flex flex-col">
+<nav class="bg-transparent flex justify-between items-center w-full p-4">
+    <a href="#" class="text-white text-4xl font-bold">Analytics App</a>
+    <div>
+        <a href="http://localhost:3001/home" class="text-white pr-4">My Reports</a>
+        <div class="dropdown inline-block relative">
+            <button class="text-white py-2 px-4 rounded inline-flex items-center">
+                <span class="mr-1">Personal Cabinet</span>
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M5.516 7.548c-2-2-5.516-1.795-5.516-1.795S4.258.999 7.258.999c3 0 5.677 2.25 7 2.25 1.323 0 4-2.25 7-2.25 3 0 5.677 4.754 5.677 4.754s-3.516-.205-5.516 1.795c-2 2-1.84 5.365-1.84 5.365S13.677 7.548 10 7.548c-3.678 0-4.484 5.365-4.484 5.365S7.516 9.548 5.516 7.548z"/>
+                </svg>
+            </button>
+            <ul class="dropdown-menu absolute hidden text-gray-700 pt-1">
+                <li class=""><a class="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
+                                href="#">Settings</a></li>
+                <li class=""><a class="rounded-b bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
+                                href="#">Exit</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="flex-grow container mx-auto px-4">
+    <div class="bg-white p-8 rounded-lg shadow-lg min-w-full md:min-w-1/2 text-center">
+        <h1 class="text-3xl font-bold mb-4">Upload Dataset</h1>
+        <div class="mb-4">
+            <input type="file" id="fileInput" name="file" accept=".xls,.xlsx" onchange="previewFile()" hidden>
+            <label for="fileInput"
+                   class="cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Select File
+            </label>
+        </div>
+        <p class="text-sm mb-4 text-gray-600">
+            Please upload only <strong>.xls</strong> or <strong>.xlsx</strong> dataset files. The first row should
+            contain column names. All other rows should contain only numeric or empty data cells.
+        </p>
+        <div id="filePreview" class="mb-4"></div>
+        <div id="fileContentPreview" class="mb-4 overflow-auto"></div>
+        <button id="confirmBtn"
+                class="hidden w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Confirm
+        </button>
+    </div>
+</div>
+<script src="html/resources/js/upload.js"></script>
+</body>
+</html>

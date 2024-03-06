@@ -5,7 +5,7 @@ RUN apt-get update && \
   apt-get purge -y python3-pip && \
   rm -rf /var/cache/apt
 
-WORKDIR backend
+WORKDIR /app
 
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 COPY requirements.txt .
