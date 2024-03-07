@@ -100,7 +100,7 @@ def test_get_customer_success(client_setup):
     app.dependency_overrides[get_current_user] = lambda: user
     response = client.get(ME_ENDPOINT)
     assert response.status_code == 200
-    report_response = json.loads(response.json())
+    report_response = json.loads(response.content.decode("utf-8"))
     assert report_response['_id'] == user.id
 
 
@@ -147,7 +147,7 @@ def test_get_customers_by_admin_success(client_setup):
     app.dependency_overrides[get_current_user] = lambda: admin
     response = client.get("/customer/")
     assert response.status_code == 200
-    content = json.loads(response.json())
+    content = json.loads(response.content.decode("utf-8"))
     assert len(content) == 1
     assert content[0]["_id"] == user.id
 

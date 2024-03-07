@@ -2,7 +2,7 @@ import logging
 
 from pydantic import EmailStr
 from starlette import status
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 
@@ -50,7 +50,7 @@ def delete_current_customer_route(current_user: User = Depends(get_current_user)
 @router.get("/me", status_code=status.HTTP_200_OK)
 def get_current_customer_route(current_user: User = Depends(get_current_user)):
     try:
-        return JSONResponse(content=get_current_customer(current_user).to_json())
+        return Response(content=get_current_customer(current_user).to_json())
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -66,7 +66,7 @@ def delete_customer_by_admin_route(customer_id: int, current_user: User = Depend
 @router.get("/", status_code=status.HTTP_200_OK)
 def get_customers_route(current_user: User = Depends(get_current_user)):
     try:
-        return JSONResponse(content=get_customers(current_user).to_json())  # type: ignore
+        return Response(content=get_customers(current_user).to_json())
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
