@@ -43,7 +43,7 @@ async function login() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     if (response.role === "customer") window.location.href = 'http://localhost:3001/home';
-                    else if (response.role === "admin") window.location.href = 'http://localhost:3001/admin_home';
+                    else if (response.role === "admin") window.location.href = 'http://localhost:3001/admin-home';
                 }
             });
         })
