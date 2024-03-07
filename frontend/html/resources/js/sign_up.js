@@ -11,38 +11,56 @@ document.querySelectorAll('.input-field').forEach(input => {
         });
     }
 });
-document.body.addEventListener('htmx:afterOnLoad', function (event) {
-    const status = event.detail.xhr.status;
-    const contentType = event.detail.xhr.getResponseHeader("Content-Type");
 
-    if (contentType && contentType.indexOf("application/json") !== -1 && status === 201) {
-        const response = JSON.parse(event.detail.xhr.responseText);
-        if (response.id) {
-            sessionStorage.setItem('userId', response.id);
+function signUp() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const passwordConfirm = document.getElementById("password_confirm").value;
+
+    fetch("http://localhost:8001/customer/sign-up", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            name: name,
+            email: email,
+            password: password,
+            password_confirm: passwordConfirm
+        },),
+        credentials: "include"
+    })
+        .then(response => {
+                if (response.status === 400) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Your data are invalid or account with this email already exists. Make sure data fit input rules',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else if (response.status === 500) {
+                    Swal.fire({
+                        title: 'Server Error!',
+                        text: 'An error occurred on the server. Please try again later.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                } else return response.json()
+            }
+        )
+        .then(response => {
             Swal.fire({
                 title: 'Success!',
-                text: 'Sign up is successful!',
+                text: 'Login is successful!',
                 icon: 'success',
                 confirmButtonText: 'OK'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'http://localhost:3001/home';
+                    if (response.role === "customer") window.location.href = 'http://localhost:3001/home';
+                    else if (response.role === "admin") window.location.href = 'http://localhost:3001/admin-home';
                 }
             });
-        }
-    } else if (status === 400) {
-        Swal.fire({
-            title: 'Error!',
-            text: 'User data is incorrect. Make sure the fields are not empty and that password and password confirm match.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    } else if (status === 500) {
-        Swal.fire({
-            title: 'Server Error!',
-            text: 'An error occurred on the server. Please try again later.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-});
+        })
+}
+

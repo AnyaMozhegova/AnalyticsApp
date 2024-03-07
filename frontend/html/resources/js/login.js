@@ -3,7 +3,6 @@ async function login() {
     const password = document.getElementById("password").value;
     const loginUrl = "http://localhost:8001/login";
 
-    // Make the first POST request
     await fetch(loginUrl, {
         method: 'POST',
         headers: {
