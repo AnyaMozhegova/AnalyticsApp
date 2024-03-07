@@ -8,12 +8,12 @@
     <script src="https://unpkg.com/htmx.org"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="html/resources/css/home.css" rel="stylesheet">
+    <link href="html/resources/css/base.css" rel="stylesheet">
     <script src="html/resources/js/customer.js"></script>
 </head>
 <body class="abstract-background justify-center items-center min-h-screen flex flex-col">
     <nav class="bg-transparent flex justify-between items-center w-full p-4">
-        <a href="#" class="text-white text-4xl font-bold">Analytics App</a>
+        <a class="text-white text-4xl font-bold">Analytics App</a>
         <div>
             <a href="http://localhost:3001/upload" class="text-white pr-4">Upload Dataset</a>
             <div class="dropdown inline-block relative">
@@ -28,12 +28,13 @@
             </div>
         </div>
     </nav>
-    <div class="flex-grow container mx-auto px-4">
-        <h1 class="text-white text-xl font-bold my-4">Reports</h1>
+<div class="h-screen flex justify-center items-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg min-w-full md:min-w-1/2 text-center">
+        <h1 class="text-3xl font-bold my-4">Reports</h1>
         <table class="table-auto w-full">
             <thead>
                 <tr>
-                    <th class="text-white">Date Uploaded</th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -42,6 +43,7 @@
             </tbody>
         </table>
     </div>
+</div>
 <script src="html/resources/js/home.js"></script>
 </body>
 </html>
