@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Dataset</title>
+    <title>Report Details</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link href="html/resources/css/base.css" rel="stylesheet">
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="/html/resources/css/base.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="html/resources/js/customer.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="/html/resources/js/customer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="abstract-background justify-center items-center min-h-screen flex flex-col">
 <nav class="bg-transparent flex justify-between items-center w-full p-4">
     <a class="text-white text-4xl font-bold">Analytics App</a>
     <div>
-        <a href="http://localhost:3001/home" class="text-white pr-4">My Reports</a>
+        <a href="http://localhost:3001/home" class="text-white pr-4">Home</a>
+        <a href="http://localhost:3001/upload" class="text-white pr-4">Upload Dataset</a>
         <div class="dropdown inline-block relative">
             <button class="text-white py-2 px-4 rounded inline-flex items-center">
                 <span class="mr-1">Personal Cabinet</span>
@@ -33,28 +35,31 @@
         </div>
     </div>
 </nav>
-<div class="flex-grow container mx-auto px-4">
+<div class="h-screen flex justify-center items-center">
     <div class="bg-white p-8 rounded-lg shadow-lg min-w-full md:min-w-1/2 text-center">
-        <h1 class="text-3xl font-bold mb-4">Upload Dataset</h1>
-        <div class="mb-4">
-            <input type="file" id="fileInput" name="file" accept=".xls,.xlsx" onchange="previewFile()" hidden>
-            <label for="fileInput"
-                   class="cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Select File
-            </label>
+        <h1 class="text-3xl font-bold mb-4">Report Details</h1>
+        <div id="reportContent" class="text-left">
+            <p id="dateUploaded" class="text-l font-xl pr-4">Date Uploaded:</p>
+            <p id="fitsCorrelation" class="font-bold text-l font-xl pr-4"></p>
+            <p id="fitsDiscriminant" class="font-bold text-l font-xl pr-4"></p>
+            <p class="text-l font-xl pr-4"><a id="datasetLink" href="#"
+                                                   class="text-blue-600 hover:underline"
+                                                   download>Download Dataset</a></p>
+            <button id="deleteReport" class="delete-btn text-l font-xl text-red-500 hover:text-red-700">Delete Report
+                <i class="fas fa-trash-alt"></i>
+            </button>
         </div>
-        <p class="text-sm mb-4 text-gray-600">
-            Please upload only <strong>.xls</strong> or <strong>.xlsx</strong> dataset files. The first row should
-            contain column names. All other rows should contain only numeric or empty data cells.
-        </p>
-        <div id="filePreview" class="mb-4"></div>
-        <div id="fileContentPreview" class="mb-4 overflow-auto"></div>
-        <button id="confirmBtn"
-                class="hidden w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-            Confirm
-        </button>
+
+        <div class="flex flex-col items-center">
+            <div class="chart-container" style="height:40vh; width:80vw; display: flex; justify-content: center;">
+                <canvas id="reportChart" style="max-width: 100%; max-height: 100%;"></canvas>
+            </div>
+            <p class="text-xl font-xl pr-4"><strong>Dataset Preview</strong></p>
+            <div id="xlsPreview" class="mt-4">
+            </div>
+        </div>
     </div>
 </div>
-<script src="html/resources/js/upload.js"></script>
+<script src="/html/resources/js/report.js"></script>
 </body>
 </html>

@@ -36,13 +36,14 @@ async function confirmUpload() {
     xhr.withCredentials = true;
     xhr.addEventListener('readystatechange', function (e) {
         if (xhr.readyState === 4 && xhr.status === 200) {
+            const reportId = xhr.response
             Swal.fire({
                 title: 'Success!',
                 text: 'Dataset has been successfully uploaded!',
                 icon: 'success',
                 confirmButtonText: 'OK'
             })
-            setTimeout(() => window.location.replace('http://localhost:3001/home'),
+            setTimeout(() => window.location.replace(`http://localhost:3001/report/${reportId}`),
                 1000)
         } else if (xhr.readyState === 4 && xhr.status === 500) {
             Swal.fire({
@@ -50,7 +51,7 @@ async function confirmUpload() {
                 text: 'An error occurred on the server. Please try again later.',
                 icon: 'error',
                 confirmButtonText: 'OK'
-            })
+            }).then(() => window.location.replace(`http://localhost:3001/home`))
         } else if (xhr.readyState === 4 && xhr.status === 400) {
             Swal.fire({
                 title: 'Error!',

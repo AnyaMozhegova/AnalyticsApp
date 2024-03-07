@@ -30,8 +30,8 @@ def get_reports_route(current_user: User = Depends(get_current_user)):
 @router.get("/{report_id}", status_code=status.HTTP_200_OK)
 def get_report_route(report_id: int, current_user: User = Depends(get_current_user)):
     try:
-        return JSONResponse(status_code=status.HTTP_200_OK,
-                            content=get_current_customer_report(report_id, current_user).to_json())
+        return Response(status_code=status.HTTP_200_OK,
+                        content=get_current_customer_report(report_id, current_user).to_json())
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
