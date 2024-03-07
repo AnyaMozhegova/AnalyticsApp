@@ -27,14 +27,14 @@ function setupFilter(currentUser, adminsBody) {
 function loadAdmins(currentUser, adminsBody, filterSubordinates) {
     adminsBody.innerHTML = '';
     allAdmins.forEach(admin => {
-        if (admin._id !== currentUser && (!filterSubordinates || admin.parent_admin_id === currentUser)) {
+        if (admin._id !== currentUser && (!filterSubordinates || admin.parent_admin === currentUser)) {
             const rowId = `admin-${admin._id}`;
             const tr = document.createElement('tr');
             tr.setAttribute('id', rowId);
             addCell(tr, admin.name);
             addCell(tr, admin.email);
             addCell(tr, `<a class="text-blue-600 hover:underline" href="http://localhost:3001/admin/${admin._id}">Profile</a>`);
-            if (admin.parent_admin_id === currentUser) {
+            if (admin.parent_admin === currentUser) {
                 addCell(tr, `<button class="delete-btn text-l font-xl text-red-500 hover:text-red-700" onclick="deactivateAdmin('${admin._id}', '${rowId}')">Deactivate</button>`);
             } else {
                 addCell(tr, '');
@@ -64,6 +64,7 @@ function deleteAdminInit() {
                     .then(response => {
                         if (response.ok) {
                             document.getElementById(rowId).remove();
+                            allAdmins = allAdmins.filter(admin => admin._id !== parseInt(adminId));
                             Swal.fire(
                                 'Deactivated!',
                                 'The admin has been deactivated.',
