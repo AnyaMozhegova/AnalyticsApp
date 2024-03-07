@@ -7,7 +7,7 @@ function appendDate(row, data) {
         hour12: false
     };
     dateCell.textContent = date.toLocaleString('en-US', options);
-    dateCell.className = "font-bold text-sm font-medium text-white pr-4";
+    dateCell.className = "text-l font-l pr-4";
     row.appendChild(dateCell);
 }
 
@@ -17,7 +17,7 @@ function appendDatasetLink(row, data) {
 
     link.href = `http://localhost:8001/report/${data._id}/file`;
     link.textContent = 'Download dataset';
-    link.className = "font-bold text-sm font-medium text-white pr-4";
+    link.className = "text-l font-l pr-4 text-blue-600 hover:underline";
     link.setAttribute('download', '');
 
     reportLinkCell.appendChild(link);
@@ -29,7 +29,7 @@ function appendViewHyperlink(row, data) {
     const link = document.createElement('a');
     link.href = `http://localhost:3001/report/${data._id}`
     link.textContent = 'View';
-    link.className = "font-bold text-sm font-medium text-white pr-4";
+    link.className = "font-bold text-l font-l pr-4";
     hyperlinkCell.appendChild(link);
     row.appendChild(hyperlinkCell);
 }
