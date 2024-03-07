@@ -3,7 +3,6 @@ async function login() {
     const password = document.getElementById("password").value;
     const loginUrl = "http://localhost:8001/login";
 
-    // Make the first POST request
     await fetch(loginUrl, {
         method: 'POST',
         headers: {
@@ -43,7 +42,7 @@ async function login() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     if (response.role === "customer") window.location.href = 'http://localhost:3001/home';
-                    else if (response.role === "admin") window.location.href = 'http://localhost:3001/admin_home';
+                    else if (response.role === "admin") window.location.href = 'http://localhost:3001/admin-home';
                 }
             });
         })

@@ -8,7 +8,7 @@ from models.user import User
 from passlib.context import CryptContext
 from services.user import get_current_user
 from starlette import status
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from errors.forbidden import ForbiddenError
 from schemas.admin import AdminCreate, AdminUpdate
@@ -58,7 +58,7 @@ def get_current_admin_children_route(current_user: User = Depends(get_current_us
 @router.get("/me", status_code=status.HTTP_200_OK)
 def get_current_admin_route(current_user: User = Depends(get_current_user)):
     try:
-        return JSONResponse(content=get_current_admin(current_user).to_json())
+        return Response(content=get_current_admin(current_user).to_json())
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -66,7 +66,7 @@ def get_current_admin_route(current_user: User = Depends(get_current_user)):
 @router.get("/", status_code=status.HTTP_200_OK)
 def get_admins_route(current_user: User = Depends(get_current_user)):
     try:
-        return JSONResponse(content=get_admins(current_user).to_json())  # type: ignore
+        return Response(content=get_admins(current_user).to_json())
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 

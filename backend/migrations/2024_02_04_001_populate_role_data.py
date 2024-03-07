@@ -4,8 +4,9 @@ import os
 from mongoengine import connect
 
 from models.role import Role
-from models.user import User
 from passlib.handlers.bcrypt import bcrypt
+
+from models.admin import Admin
 
 MONGODB_URL = os.getenv("MONGODB_URL")
 MAIN_USER_EMAIL = os.getenv("MAIN_USER_EMAIL")
@@ -29,8 +30,8 @@ class Migration:
 
         admin_role = Role.objects(name='Admin').first()
 
-        if not User.objects(email=MAIN_USER_EMAIL):
-            User(name=MAIN_USER_NAME, email=MAIN_USER_EMAIL, password=bcrypt.hash(MAIN_USER_PASSWORD),
+        if not Admin.objects(email=MAIN_USER_EMAIL):
+            Admin(name=MAIN_USER_NAME, email=MAIN_USER_EMAIL, password=bcrypt.hash(MAIN_USER_PASSWORD),
                  role=admin_role).save()
             logging.info("Main user created.")
 
