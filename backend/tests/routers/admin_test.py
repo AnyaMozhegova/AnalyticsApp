@@ -100,7 +100,7 @@ def test_get_current_admin_success(client_setup):
     app.dependency_overrides[get_current_user] = lambda: parent
     response = client.get(ME_ENDPOINT)
     assert response.status_code == 200
-    content = json.loads(response.json())
+    content = json.loads(response.content.decode("utf-8"))
     assert content['_id'] == parent.id
 
 
@@ -118,7 +118,7 @@ def test_get_admins_success(client_setup):
     app.dependency_overrides[get_current_user] = lambda: parent
     response = client.get("/admin/")
     assert response.status_code == 200
-    content = json.loads(response.json())
+    content = json.loads(response.content.decode("utf-8"))
     assert len(content) == 1
     assert content[0]['_id'] == parent.id
 
