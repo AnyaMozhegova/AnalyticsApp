@@ -1,1 +1,3 @@
 ./tests
+/htmlcov
+/.pytest_cache

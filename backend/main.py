@@ -6,12 +6,13 @@ import os
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm
 from mongoengine import connect
+from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
 
+from routers.admin import router as admin_router
 from routers.customer import router as customer_router
 from routers.report import router as report_router
-from routers.admin import router as admin_router
 from services.user import create_token
 
 logging.basicConfig(level=logging.INFO,
@@ -28,6 +29,7 @@ app.include_router(customer_router)
 app.include_router(admin_router)
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS"
+
 
 @app.middleware("http")
 async def add_cors_headers(request: Request, call_next):
@@ -49,6 +51,11 @@ async def root():
 @app.post("/login")
 async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     return create_token(form_data.username, form_data.password)
+
+
+@app.post("/sign-out", status_code=status.HTTP_201_CREATED)
+def sign_out_route(response: Response):
+    response.delete_cookie(key="session")
 
 
 @app.options("/{full_path:path}")

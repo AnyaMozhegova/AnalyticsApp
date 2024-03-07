@@ -17,20 +17,22 @@
     <div>
         <a href="http://localhost:3001/admin-home" class="text-white pr-4">Admins</a>
         <a href="http://localhost:3001/customers" class="text-white pr-4">Customers</a>
-        <div class="dropdown inline-block relative">
-            <button class="text-white py-2 px-4 rounded inline-flex items-center">
+        <details class="dropdown inline-block relative">
+            <summary class="text-white py-2 px-4 rounded inline-flex items-center cursor-pointer">
                 <span class="mr-1">Personal Cabinet</span>
-                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M5.516 7.548c-2-2-5.516-1.795-5.516-1.795S4.258.999 7.258.999c3 0 5.677 2.25 7 2.25 1.323 0 4-2.25 7-2.25 3 0 5.677 4.754 5.677 4.754s-3.516-.205-5.516 1.795c-2 2-1.84 5.365-1.84 5.365S13.677 7.548 10 7.548c-3.678 0-4.484 5.365-4.484 5.365S7.516 9.548 5.516 7.548z"/>
-                </svg>
-            </button>
-            <ul class="dropdown-menu absolute hidden text-gray-700 pt-1">
-                <li class=""><a class="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
-                                href="#">Settings</a></li>
-                <li class=""><a class="rounded-b bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
-                                href="#">Exit</a></li>
-            </ul>
-        </div>
+                <i class="fa-solid fa-user"></i>
+            </summary>
+            <div class="dropdown-menu bg-gray-700 p-2 rounded">
+                <button id="settings"
+                        class="w-full bg-transparent hover:bg-gray-400 py-2 px-4 rounded transition-colors duration-150">
+                    Settings
+                </button>
+                <button id="exit"
+                        class="w-full bg-transparent hover:bg-gray-400 py-2 px-4 rounded transition-colors duration-150 mt-2">
+                    Exit
+                </button>
+            </div>
+        </details>
     </div>
 </nav>
 <div class="h-screen flex justify-center items-center">
@@ -65,6 +67,7 @@
         </form>
     </div>
 </div>
+<script src="/html/resources/js/sign-out.js"></script>
 <script src="/html/resources/js/admin-create.js"></script>
 </body>
 </html>

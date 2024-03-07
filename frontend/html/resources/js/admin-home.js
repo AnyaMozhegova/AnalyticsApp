@@ -17,12 +17,15 @@ function fetchAndStoreAdmins() {
 
 function setupFilter(currentUser, adminsBody) {
     const filterToggle = document.getElementById('filter-toggle');
+    const filterText = filterToggle.querySelector('span');
+
     filterToggle.onclick = function () {
-        const isFiltering = filterToggle.textContent.includes('Show All Admins');
+        const isFiltering = filterText.textContent.includes('Show All Admins');
         loadAdmins(currentUser, adminsBody, !isFiltering);
-        filterToggle.textContent = isFiltering ? 'Show My Subordinates' : 'Show All Admins';
+        filterText.textContent = isFiltering ? 'Show My Subordinates' : 'Show All Admins';
     };
 }
+
 
 function loadAdmins(currentUser, adminsBody, filterSubordinates) {
     adminsBody.innerHTML = '';
