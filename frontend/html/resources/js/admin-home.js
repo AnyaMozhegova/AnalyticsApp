@@ -33,7 +33,6 @@ function loadAdmins(currentUser, adminsBody, filterSubordinates) {
             tr.setAttribute('id', rowId);
             addCell(tr, admin.name);
             addCell(tr, admin.email);
-            addCell(tr, `<a class="text-blue-600 hover:underline" href="http://localhost:3001/admin/${admin._id}">Profile</a>`);
             if (admin.parent_admin === currentUser) {
                 addCell(tr, `<button class="delete-btn text-l font-xl text-red-500 hover:text-red-700" onclick="deactivateAdmin('${admin._id}', '${rowId}')">Deactivate</button>`);
             } else {
@@ -73,7 +72,7 @@ function deleteAdminInit() {
                         } else if (response.status === 404) {
                             Swal.fire({
                                     title: 'Error!',
-                                    text: 'Sorry, the report is not found',
+                                    text: 'Sorry, the admin is not found',
                                     icon: 'error',
                                     confirmButtonText: 'OK'
                                 }
