@@ -16,7 +16,7 @@
     <a class="text-white text-4xl font-bold">Analytics App</a>
     <div>
         <a href="http://localhost:3001/admin-create" class="text-white pr-4">Create an Admin</a>
-        <a href="http://localhost:3001/customers" class="text-white pr-4">Customers</a>
+        <a href="http://localhost:3001/admin-home" class="text-white pr-4">Admins</a>
         <div class="dropdown inline-block relative">
             <button class="text-white py-2 px-4 rounded inline-flex items-center">
                 <span class="mr-1">Personal Cabinet</span>
@@ -36,10 +36,7 @@
 <div class="h-screen flex justify-center items-center">
     <div class="bg-white p-8 rounded-lg shadow-lg min-w-full md:min-w-1/2">
         <div class="flex justify-between items-center">
-            <h1 class="text-3xl font-bold pr-4">Admins</h1>
-            <button id="filter-toggle" class="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold pr-4 py-2 px-4 rounded">
-                Show My Subordinates
-            </button>
+            <h1 class="text-3xl font-bold pr-4">Customers</h1>
         </div>
         <table class="table-auto w-full mt-4">
             <thead>
@@ -49,11 +46,11 @@
                 <th></th>
             </tr>
             </thead>
-            <tbody id="admins-body">
+            <tbody id="customers-body">
             </tbody>
         </table>
     </div>
 </div>
-<script src="/html/resources/js/admin-home.js"></script>
+<script src="/html/resources/js/customers.js"></script>
 </body>
 </html>
