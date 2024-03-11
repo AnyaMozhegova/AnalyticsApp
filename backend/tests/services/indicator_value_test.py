@@ -162,11 +162,13 @@ def test_get_indicator_values_success(db_setup):
     new_indicator_value_create = IndicatorValueCreate(column=report.columns[0].id,
                                                       report_indicator=report_indicator.id)
     indicator_value_id = create_indicator_value(new_indicator_value_create)
+    indicator_value = IndicatorValue.objects(id=indicator_value_id).first().value
     indicator_values_get = IndicatorValuesGet(user=user.id, report=report.id, column=indicator_value_create.column)
     indicator_values = get_indicator_values(indicator_values_get)
     assert indicator_values is not None
     assert len(indicator_values) == 1
-    assert indicator_values[0].id == indicator_value_id
+    assert indicator_values[0][0] == indicator_value
+    assert indicator_values[0][1] == report_indicator.name
 
 
 def test_get_indicator_value_by_id_success(db_setup):
