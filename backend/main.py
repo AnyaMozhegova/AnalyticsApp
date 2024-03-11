@@ -53,7 +53,7 @@ async def login_for_access_token(response: Response, form_data: OAuth2PasswordRe
     return create_token(form_data.username, form_data.password)
 
 
-@app.post("/sign-out", status_code=status.HTTP_201_CREATED)
+@app.post("/sign-out", status_code=status.HTTP_200_OK)
 def sign_out_route(response: Response):
     response.delete_cookie(key="session")
 
