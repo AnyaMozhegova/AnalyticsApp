@@ -7,7 +7,8 @@ from starlette.responses import FileResponse, JSONResponse, Response
 
 from errors.not_found import NotFoundError
 from models.user import User
-from services.report import get_current_customer_report, get_current_customer_reports, delete_report, get_report_file
+from services.report import get_current_customer_report, get_current_customer_reports, delete_report, get_report_file, \
+    get_report_indicator_values
 from services.user import get_current_user
 
 logging.basicConfig(level=logging.INFO,
@@ -41,6 +42,15 @@ def delete_report_route(report_id: int, current_user: User = Depends(get_current
     try:
         return JSONResponse(status_code=status.HTTP_200_OK,
                             content=delete_report(report_id, current_user))
+    except NotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.get("/{report_id}/indicator_values", status_code=status.HTTP_200_OK)
+def indicator_values_route(report_id: int, current_user: User = Depends(get_current_user)):
+    try:
+        return JSONResponse(status_code=status.HTTP_200_OK,
+                        content=get_report_indicator_values(report_id, current_user))
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
