@@ -154,9 +154,10 @@ def validate_indicator_value_name(column: ReportColumn, report_indicator_name: s
         f"in column with id = {column.id}")
 
 
-def get_indicator_values(indicator_values_get: IndicatorValuesGet) -> Optional[List[IndicatorValue]]:
+def get_indicator_values(indicator_values_get: IndicatorValuesGet) -> [[float, str]]:
     column = validate_indicator_value_column(indicator_values_get)
-    return [indicator_value for indicator_value in column.indicator_values if indicator_value.is_active]
+    return [[indicator_value.value, indicator_value.report_indicator.name] for indicator_value in
+            column.indicator_values if indicator_value.is_active]
 
 
 def get_indicator_value(indicator_value_get: IndicatorValueGet) -> Optional[IndicatorValue]:

@@ -8,17 +8,17 @@ import pandas as pd
 from errors.bad_request import BadRequestError
 from errors.not_found import NotFoundError
 from fastapi import Depends, UploadFile
+from models.customer import Customer
 from models.report import Report
 from models.report_column import ReportColumn
 from models.user import User
 from schemas.indicator_value import IndicatorValueCreate
+from schemas.indicator_value import IndicatorValuesGet
 from services.indicator_value import create_indicator_value
-from services.report_indicator import get_report_indicators
-
-from models.customer import Customer
-from services.user import get_current_user
-
+from services.indicator_value import get_indicator_values
 from services.report_column import delete_report_column
+from services.report_indicator import get_report_indicators
+from services.user import get_current_user
 
 
 def delete_file(file_path: str):
@@ -214,3 +214,17 @@ def get_report_file(report_id: int, current_user: User = Depends(get_current_use
     if not os.path.exists(file_path):
         raise NotFoundError(f"Could not get report file with id {report_id}. File does not exist.")
     return report.report_link
+
+
+def get_report_indicator_values(report_id: int, current_user: User = Depends(get_current_user)) -> {str: [float, str]}:
+    if not current_user or not (customer := Customer.objects(id=current_user.id, is_active=True).first()):
+        raise NotFoundError(f"Could not get report indicator values for id = {report_id}. Customer does not exist.")
+    if not (report := Report.objects(id=report_id, is_active=True, user=customer).first()):
+        raise NotFoundError(f"Could not get report indicator values for id {report_id}. Report does not exist.")
+    report_columns = report.columns
+    column_values: {str: [float, str]} = {}
+    for report_column in report_columns:
+        indicator_values_get = IndicatorValuesGet(user=current_user.id, report=report_id, column=report_column.id)
+        indicator_values: [[float, str]] = get_indicator_values(indicator_values_get)
+        column_values[report_column.name] = indicator_values
+    return column_values
