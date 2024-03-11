@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="abstract-background justify-center items-center min-h-screen flex flex-col">
-<nav class="bg-transparent flex justify-between items-center w-full p-4">
+<nav class="bg-transparent flex justify-between items-center w-full p-4 z-60">
     <a class="text-white text-4xl font-bold">Analytics App</a>
     <div>
         <a href="http://localhost:3001/home" class="text-white pr-4">Home</a>
@@ -38,7 +38,7 @@
     </div>
 </nav>
 <div class="h-screen flex justify-center items-center">
-    <div class="bg-white p-8 rounded-lg shadow-lg min-w-full md:min-w-1/2 text-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg min-w-full md:min-w-1/2 text-center mt-60">
         <h1 class="text-3xl font-bold mb-4">Report Details</h1>
         <div id="reportContent" class="text-left">
             <p id="dateUploaded" class="text-l font-xl pr-4">Date Uploaded:</p>
@@ -51,7 +51,7 @@
                 <i class="fas fa-trash-alt"></i>
             </button>
         </div>
-
+        <div id="indicatorValuesTable" class="mt-4"></div>
         <div class="flex flex-col items-center">
             <div class="chart-container" style="height:40vh; width:80vw; display: flex; justify-content: center;">
                 <canvas id="reportChart" style="max-width: 100%; max-height: 100%;"></canvas>

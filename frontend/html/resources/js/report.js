@@ -179,6 +179,68 @@ function deleteReport(reportId) {
         .catch(error => console.error('Error:', error));
 }
 
+function displayIndicatorValues(reportId) {
+    fetch(`http://localhost:8001/report/${reportId}/indicator_values`, {
+        method: 'GET',
+        credentials: "include"
+    })
+        .then(response => {
+                if (response.status === 404) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Sorry, the report is not found',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                } else
+                    return response.json()
+            }
+        ).then(data => {
+            const table = document.createElement('table');
+            table.className = 'min-w-full leading-normal table-fixed';
+
+            let allStats = new Set();
+            Object.values(data).forEach(column => {
+                column.forEach(statPair => {
+                    allStats.add(statPair[1]);
+                });
+            });
+            const statsOrder = Array.from(allStats);
+
+            let thead = document.createElement('thead');
+            let headerRow = document.createElement('tr');
+            headerRow.innerHTML = `<th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>`; // Empty first cell for column names
+            statsOrder.forEach(stat => {
+                headerRow.innerHTML += `<th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${stat}</th>`;
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+
+            let tbody = document.createElement('tbody');
+            Object.entries(data).forEach(([columnName, values]) => {
+                let row = document.createElement('tr');
+                row.innerHTML = `<td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${columnName}</td>`;
+                let valueMap = new Map(values.map(([value, stat]) => [stat, value]));
+                statsOrder.forEach(stat => {
+                    let cellValue = valueMap.has(stat) ? valueMap.get(stat) : '';
+                    if (typeof cellValue === 'number') {
+                        let decimalDigits = (cellValue.toString().split('.')[1] || '').length;
+                        if (decimalDigits > 4) {
+                            cellValue = cellValue.toFixed(4);
+                        }
+                    }
+                    row.innerHTML += `<td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${cellValue}</td>`;
+                });
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+
+            document.getElementById('indicatorValuesTable').appendChild(table);
+        })
+}
+
+
 function init() {
     const reportId = window.location.pathname.split('/').pop();
     const apiUrl = `http://localhost:8001/report/${reportId}`;
@@ -213,6 +275,7 @@ function init() {
             displayDatasetLink(data)
             displayFitsCorrelation(data)
             displayFitsDiscriminant(data)
+            displayIndicatorValues(reportId);
             if (data.report_link) {
                 fetchAndProcessXlsForChart(`http://localhost:8001/report/${data._id}/file`);
             }
